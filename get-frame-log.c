@@ -31,20 +31,20 @@ uint8_t create_virtual_socket(void)
 
 	// Commands to create a virtual socket on kernel linux	
 	strcpy(linux_command, "sudo modprobe vcan");
-	check_return = system(linux_command);
+	system(linux_command);
 	sprintf(linux_command,"sudo ip link add dev %s type vcan", VIRTUAL_SOCKET_NAME);
-	check_return = system(linux_command);
+	system(linux_command);
 	sprintf(linux_command,"sudo ip link set up %s", VIRTUAL_SOCKET_NAME);
 	check_return = system(linux_command);
 
 	if(check_return == 0)
     {
-        debug(" Created virtual module, with name of %s \n", VIRTUAL_SOCKET_NAME);
+        printf(" Created virtual module, with name of %s \n", VIRTUAL_SOCKET_NAME);
         return 0;
     }
     else
     {   
-        log_err(" \n Error creating virtual module \n");
+        printf(" \n Error creating virtual module \n");
         return 1;
     }
 }
@@ -115,16 +115,16 @@ uint8_t debugCAN(can_frame frame)
 { 
 	if(frame.can_id  == -1)
 	{
-		log_err("function read() in get_frame_data returns a erro");
+		printf("function read() in get_frame_data returns a erro");
 		return 1;
 	}
 	else
 	{
 		int i;
-		debug("0x%03X [%d] ",frame.can_id, frame.can_dlc);
+		printf("0x%03X [%d] ",frame.can_id, frame.can_dlc);
 
 		for (i = 0; i < frame.can_dlc; i++)
-			debug("%02X ",frame.data[i]);
+			printf("%02X ",frame.data[i]);
 
 		printf("\r\n");
 		return 0;
@@ -147,12 +147,12 @@ uint8_t close_socket(void)
 
     if(check_return == 0)
     {
-        debug(" Virtual device removed ");
+        printf(" Virtual device removed ");
         return 0;
     }
     else
     {
-        debug(" Error removing virtual device ");
+        printf(" Error removing virtual device ");
         return 1;
     }
 }
@@ -171,7 +171,7 @@ uint8_t read_frame_log(char *log_dir)
 	read_log = fopen(log_dir,"r");
 	if ( read_log == NULL)
 	{
-		log_err(" Erro ao ler o arquivo \n");
+		printf(" Erro ao ler o arquivo \n");
 		return 1;
 	}
 	else 
@@ -179,7 +179,7 @@ uint8_t read_frame_log(char *log_dir)
 		do
 		{
 			fgets(line, MAX_LINE_LEN,read_log);
-			debug("%s", line);
+			printf("%s", line);
 		}while(!feof(read_log));
 
 		fclose(read_log);
