@@ -1,2 +1,2 @@
 # improve-my-c
-<h3>Alguns programas que estou criando para C do basico ao avançado. Foco ( Linux embarcado, Baremetal) </h3>
+<h3> Some programs I am creating for C from basic to advanced. Focus (embedded Linux, Baremetal) </h3>
