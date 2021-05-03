@@ -29,7 +29,6 @@ uint8_t read_frame_log(char *log_dir)
 		fclose(read_log);
 		return 0;
 	}
-	
 }
 
 char  *create_doc_log(void)
