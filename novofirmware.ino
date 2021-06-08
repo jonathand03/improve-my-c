@@ -5,56 +5,126 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
-/* #include "defines.h" */
+
+/********************************************* INDEX DE FUNÇÕES PARA UTILIZAR **************************************************/
+void ativacao_atuador_standup(void);
+/********************************************* MAPEAMENTO DE PORTAS ************************************************************/
+/* BATERIA     */
+const int bat_monitor                                = 34;     /* [MONITORAMENTO] Monitoramento da bateria                     */
+/* ATUADORES sem multiplexador  */
+/*const int atuador_standup_avanco                   = 32;     /* [ATUADOR] Standup: pino de [avanço]                          */
+/*const int atuador_standup_recuo                    = 35;     /* [ATUADOR] Standup: pino de [recuo]                           */
+/*const int atuador_elevador_base_avanco             = 25;     /* [ATUADOR] Elevador da base: pino de [avanço]                 */
+/*const int atuador_elevador_base_recuo              = 26;     /* [ATUADOR] Elevador da base: pino de [recuo]                  */
+/*const int atuador_elevador_suporte_circ_avanco     = 27;     /* [ATUADOR] Elevador do suporte circulatório: pino de [avanço] */
+/*const int atuador_elevador_suporte_circ_recuo      = 14;     /* [ATUADOR] Elevador do suporte circulatório: pino de [recuo]  */
+/*const int atuador_suporte_circu_avanco             = 12;     /* [ATUADOR] Suporte circulatório: pino de [avanço]             */
+/*const int atuador_suporte_circu_recuo              = 13;     /* [ATUADOR] Suporte circulatório: pino de [recuo]              */
+/*const int atuador_altura_encosto_avanco            = 15;     /* [ATUADOR] Altura do enconsto: pino de [avanço]               */
+/*const int atuador_altura_encosto_recuo             = 23;     /* [ATUADOR] Altura do enconsto: pino de [recuo]                */
+/*const int atuador_inclinacao_encosto_avanco        = 16;     /* [ATUADOR] Inclinação do encosto: pino de [avanço]            */
+/*const int atuador_inclinacao_encosto_recuo         = 17;     /* [ATUADOR] Inclinação do encosto: pino de [recuo]             */
+/*const int atuador_distancia_assento_encosto_avanco = 18;     /* [ATUADOR] Distancia do assento e encosto: pino de [avanço]   */
+/*const int atuador_distancia_assento_encosto_recuo  = 19;     /* [ATUADOR] Distancia do assento e encosto: pino de [recuo]    */
+
+/* Atuadores com multiplexador */
+const int multiplex_port_s0                          = 25;     /* [Multiplexador] Endereço 0 do multiplexador                  */ 
+const int multiplex_port_s1                          = 26;     /* [Multiplexador] Endereço 1 do multiplexador                  */ 
+const int multiplex_port_s2                          = 27;     /* [Multiplexador] Endereço 2 do multiplexador                  */
+const int multiplex_port_s3                          = 15;     /* [Multiplexador] Endereço 3 do multiplexador                  */ 
+const int multiplex_module_enable_1                  = 14;     /* [Multiplexador] Enable para ativação do multiplexador 1      */ 
+const int multiplex_module_enable_2                  = 13;     /* [Multiplexador] Enable para ativação do multiplexador 2      */
 
 
-/*************************************** I2C *************************************************/
-    /* Mapeamento do MCP23017 */
-    #define MCPsenAddress  0x24       /* [MCP] IO Sensors   24 = A2 high, A1 low, A0 low  */
-    #define MCPactAddress  0x26       /* [MCP] IO Actuators 26 = A2 high, A1 high, A0 low */
-    #define ResetMCPSen  05           /* [MCP] IO Sensors reset pin                       */
-    #define ResetMCPAct  12           /* [MCP] IO Actuators reset pin                     */
-    #define GPA 0x12                  /* [MCP] DATA PORT REGISTER A                       */
-    #define GPB 0x13                  /* [MCP] DATA PORT REGISTER B                       */
-    #define IODIRA 0x00               /* [MCP] I/O DIRECTION REGISTER A                   */
-    #define IODIRB 0x01               /* [MCP] I/O DIRECTION REGISTER B                   */
+/* PORTAS I2C  */
+const int giroscopio_encosto_sda                     = 21;     /* [SENSOR] Giroscópio para o encosto: pino I2C [sda]           */
+const int giroscopio_encosto_scl                     = 22;     /* [SENSOR] Giroscópio para o encosto: pino I2C [scl]           */
+const int giroscopio_suporte_circu_sda               = 23;     /* [SENSOR] Giroscópio suporte circulatorio: pino I2C [sda]     */
+const int giroscopio_suporte_circu_scl               = 33;     /* [SENSOR] Giroscópio suporte circulatorio: pino I2C [scl]     */
+/*******************************************  BLUETOOTH LOW ENERGY  **********************************************************/
 
-    /* Mapeamento do Acelerometro */
-    #define MPUsscAddress  0x69       /* [MPU] Accelerometers :: AD0 is logic high on the PCB    */
-    #define MPUbckAddress  0x68       /* [MPU] back STEVE angulation :: AD0 is logic low on PCB  */
-    #define intMPUssc      19
-    #define intMPUbck      18
 
-    /* Actuator Mapping */
-    #define actElevacao0  2         /* lowering actuator                           */
-    #define actElevacao1  3         /* lifting actuator                            */
-    #define actSSC0   4             /* Down SSC                                    */
-    #define actSSC1   5             /* rising SSC                                  */
-    #define actAlturaEncosto0  6    /* Micro Adjustment of X1  [Altura do encosto] */
-    #define actAlturaEncosto1  7    /* Micro Adjustment of X1  [Altura do encosto] */
-    #define actEncosto0  8          /* Micro adjustment X2 ang pos                 */
-    #define actEncosto1  9          /* Micro adjustment X2 ang neg                 */
-    #define actAssento0  10         /* Micro adjustment X2                         */
-    #define actAssento1  11         /* Micro adjustment X2                         */
-    #define actAlturaGeral0  12     /* FREE PORT                                   */
-    #define actAlturaGeral1  13     /* FREE PORT                                   */
-    #define actAlturaBase0   14     /* FREE PORT                                   */
-    #define actAlturaBase1   15     /* FREE PORT                                   */
+/* BLOCO DO GATT */
+#define SERVICE_UUID            "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"      /* Serviço do atuador                      */
+#define CHARACTERISTIC_UUID_RX  "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"      /* Caracteristica do atuador               */
 
-    /* Limit Switches Mapping */
-    #define senElevRvs  0   /* initial stroke lss 6. Steve in a sitting position       */
-    #define senElevFwd  1   /* limit switch full stroke. Steve in an elevated position */
-    #define senSSCRvs   2   /* Down SSC                                    */
-    #define senSSCFwd   3   /* Up SSC                                      */
-    #define senX1Rvs    4   /* Micro Adjustment of X1 [Altura do encosto]  */
-    #define senX1Fwd    5   /* Micro Adjustment of X1 [Altura do encosto]  */
-    #define senX2Fwd    7   /* FREE PORT                                   */
-    #define senX2Rvs    8   /* FREE PORT                                   */
-    #define senX2Fwd2   9   /* FREE PORT                                   */
-    #define senX2Rvs2   10  /* FREE PORT                                   */
-    #define senX3Fwd    11  /* FREE PORT                                   */
-    #define senX3Rvs    12  /* FREE PORT                                   */
-    #define senX4Fwd    13  /* FREE PORT                                   */
-    #define senX4Rvs    14  /* FREE PORT                                   */
+/* FUNÇÕES E CLASSES DO BLE */
+BLECharacteristic *pCharacteristic;
+bool deviceConnected = false;
+void startBLE(void);
+/* Pilha de execução do BLE Server */
+class MyServerCallbacks: public BLEServerCallbacks 
+{
+    void onConnect(BLEServer* pServer)
+    {
+      deviceConnected = true;
+    };
+    void onDisconnect(BLEServer* pServer)
+    {
+      deviceConnected = false;
+    }
+};
+/* Pilha de execução do BLE Client */
+class MyCallbacks: public BLECharacteristicCallbacks
+{
+    void onWrite(BLECharacteristic *pCharacteristic)
+    {
+      
+      std::string value = pCharacteristic->getValue();
+      if(value == "1")
+      {
+       ledcWrite(0, 1024);
+        delay(100);
+      }
+      else
+      {
+        ledcWrite(0, 0);
+        delay(100);
+      }
+};
 
-/************************************** SETUP ***********************************************/
+/****************************************  FUNÇÕES DO SISTEMA  ***********************************************************/
+/* Função de Start do BLE */
+void startBLE(void)
+{
+  /* Create the BLE Device */
+  BLEDevice::init("Steve_TEST"); 
+ 
+  /* Configura o dispositivo como Servidor BLE */
+  BLEServer *pServer = BLEDevice::createServer();
+  pServer->setCallbacks(new MyServerCallbacks());
+  /* Cria o servico UART */
+  BLEService *pService = pServer->createService(SERVICE_UUID);
+ 
+  /* cria uma característica BLE para recebimento dos dados */
+  BLECharacteristic *pCharacteristic = pService->createCharacteristic(
+                                         CHARACTERISTIC_UUID_RX,
+                                         BLECharacteristic::PROPERTY_WRITE
+                                       );
+  pCharacteristic->setCallbacks(new MyCallbacks());
+  /* Inicia o serviço */
+  pService->start();
+  /* Inicia a descoberta do ESP32 */
+  pServer->getAdvertising()->start();
+  #ifdef DEBUG 
+    Serial.println("Esperando um cliente se conectar...");
+  #endif
+}
+
+
+/*****************************************************  SETUP  ***********************************************************/
+void setup() 
+{
+  Serial.begin(115200);
+  pinMode(giroscopio_suporte_circu_scl, OUTPUT);
+  ledcAttachPin(giroscopio_suporte_circu_scl, 0);
+  ledcSetup(0, 1000, 10);
+  startBLE();
+ 
+}
+/*****************************************************  MAIN  ************************************************************/
+void loop() 
+{
+
+}
+//void mapping_multiplex()
