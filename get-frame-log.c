@@ -170,17 +170,17 @@ uint8_t close_socket(void)
 }
 
 /*!
- * @brief Verifica se há dados no socket baseado no tempo definido em 50 milisegundos.
- * @param[in] socket é o socket de onde será pegue os dados.
- * @return No caso de sucesso, retorna os dados gerados no socket, caso erro, retorna o codigo de erro,
- * -1 para erro na leitura, -2 para timeout.
+ * @brief Checks for data on socket based on time set to 50 milliseconds.
+ * @param[in] socket is the socket from which to get the data.
+ * @return In case of success, returns the data generated on the socket, in case of error, returns the error code,
+ * -1 for reading error, -2 for timeout.
  */
 int timer_routine_service_int(int socket)
 {
     const int ERROR = -1;
     const int WAITING_DATA = 0;
     const int READY_TO_READ = 1;
-    // Flag de tratamento do timeout
+    // timeout treatment flag
     int socket_watcher;
     
     struct pollfd event_test[1];
