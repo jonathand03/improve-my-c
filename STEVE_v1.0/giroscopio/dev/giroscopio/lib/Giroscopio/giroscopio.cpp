@@ -89,3 +89,32 @@ bool modo_operacional_sensor_mpu(Adafruit_MPU6050 &Sensor, bool status)
 {
         return Sensor.enableSleep(status);
 }
+
+
+int verifica_endereco_sensor(int endereco)
+{
+        uint8_t primeiro_endereco = 1, ultimo_endereco = 127;
+
+        uint8_t sinalizador, endereco_atual = primeiro_endereco;
+        int numero_dispositivos;
+        //Serial.println("Verificando...");
+        numero_dispositivos = 0;
+        for (endereco_atual = primeiro_endereco; endereco_atual < ultimo_endereco; endereco_atual++)
+        {
+                while (endereco_atual != endereco)
+                {
+                        Wire.beginTransmission(endereco_atual);
+                        sinalizador = Wire.endTransmission();
+                        if (sinalizador == 0)
+                        {
+                               
+                                numero_dispositivos++;
+                        }
+                        else if (sinalizador == 4)
+                        {
+                              
+                        }
+                        endereco_atual++;
+                }
+        }
+}
