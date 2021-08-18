@@ -21,6 +21,9 @@ void setup()
 int i, i1;
 void loop()
 {
+        mostra_dados_giroscopio(leitura_sensor_mpu(Mpu1));
+        delay(1000);
+                /*
         Serial.println("Vamos inicializar o sensor 1...");
         for(i = 0; i< 10; i++)
         {
@@ -39,6 +42,7 @@ void loop()
         }
       
         delay(5000);
+        */
 }       
 
 
