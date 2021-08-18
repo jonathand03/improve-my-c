@@ -8,7 +8,7 @@
 extern const int endereco_mpu_modulo_1 = ENDERECO_0X68;
 extern const int endereco_mpu_modulo_2 = ENDERECO_0X69;
 
-/*! @fn int inicializa_mpu6050(void)
+/*! @fn int inicializa_sensor_mpu(int endereco_sensor_mpu, Adafruit_MPU6050 &Sensor)
  * @brief Inicializa o módulo MPU6050, definindo a calibração do 
  * sensores acelerômetro e giroscópio
  * @return Retorna  SUCESSO , caso o sensor seja inicializado com sucesso. Retorna  SINALIZADOR_ERRO , caso falhe.
@@ -27,7 +27,7 @@ int inicializa_sensor_mpu(int endereco_sensor_mpu, Adafruit_MPU6050 &Sensor)
         return SUCESSO;
 }
 
-/*! @fn sensors_event_t *leitura_sensor_mpu(sensors_event_t *vetor_dados_mpu)
+/*! @fn sensors_event_t leitura_sensor_mpu(Adafruit_MPU6050 &Sensor)
  * @brief   Faz a leitura dos sensores [ Giroscópio] e [Acelerômetro] do MPU6050
  * @param[in] Sensor é o objeto do tipo Adafruit_MPU6050 onde é armazenado
  * a estrutura do Sensor mpu_6050
@@ -35,7 +35,7 @@ int inicializa_sensor_mpu(int endereco_sensor_mpu, Adafruit_MPU6050 &Sensor)
 */
 sensors_event_t leitura_sensor_mpu(Adafruit_MPU6050 &Sensor)
 {
-        bool status;
+        bool status_leitura_sensor;
         sensors_event_t leitura_acelerometro; //!< Variável que irá guardar a leitura do acelerometro
         sensors_event_t leitura_giroscopio;     //!< Variável que irá guardar a leitura do giroscopio
         sensors_event_t leitura_temperatura;  //!< Variável que irá guardar a leitura da temperatura
@@ -45,17 +45,17 @@ sensors_event_t leitura_sensor_mpu(Adafruit_MPU6050 &Sensor)
         *
         *   ******
         */
-        status = Sensor.getEvent(&leitura_acelerometro, &leitura_giroscopio, &leitura_temperatura);
-        if(status == false) //<! Caso não seja possível fazer a leitura
+        status_leitura_sensor = Sensor.getEvent(&leitura_acelerometro, &leitura_giroscopio, &leitura_temperatura);
+        if(status_leitura_sensor == false || verifica_endereco_sensor() == SINALIZADOR_ERRO) //<! Caso não seja possível fazer a leitura
         {
                 debug("Não foi possível ler os dados do sensor");
-                leitura_giroscopio.gyro.status = -1;
-                return  leitura_giroscopio;
+                leitura_acelerometro.acceleration.status = SINALIZADOR_ERRO;
+                return  leitura_acelerometro;
         }
         else
         {
-                leitura_giroscopio.gyro.status = 0;
-                return leitura_giroscopio; //<! Retorna a estrutura com os dados do giroscopio
+                leitura_acelerometro.acceleration.status = SUCESSO;
+                return leitura_acelerometro; //<! Retorna a estrutura com os dados do giroscopio
         }
 }
 
@@ -68,13 +68,13 @@ sensors_event_t leitura_sensor_mpu(Adafruit_MPU6050 &Sensor)
 */
 int mostra_dados_giroscopio(sensors_event_t leitura_sensor_mpu)
 {
-        if(leitura_sensor_mpu.gyro.status == SINALIZADOR_ERRO)
+        if(leitura_sensor_mpu.acceleration.status == SINALIZADOR_ERRO)
                 return SINALIZADOR_ERRO;
         
         Serial.println();
-        Serial.print("Rotacao x: ");Serial.print(leitura_sensor_mpu.gyro.x);
-        Serial.print(" Rotacao y: ");Serial.print(leitura_sensor_mpu.gyro.y);
-        Serial.print(" Rotacao z: ");Serial.print(leitura_sensor_mpu.gyro.z);
+        Serial.print("Rotacao x: ");Serial.print(leitura_sensor_mpu.acceleration.x);
+        Serial.print(" Rotacao y: ");Serial.print(leitura_sensor_mpu.acceleration.y);
+        Serial.print(" Rotacao z: ");Serial.print(leitura_sensor_mpu.acceleration.z);
         Serial.println();
         return SUCESSO;
 }
@@ -90,31 +90,44 @@ bool modo_operacional_sensor_mpu(Adafruit_MPU6050 &Sensor, bool status)
         return Sensor.enableSleep(status);
 }
 
-
-int verifica_endereco_sensor(int endereco)
+int verifica_endereco_sensor()
 {
-        uint8_t primeiro_endereco = 1, ultimo_endereco = 127;
-
-        uint8_t sinalizador, endereco_atual = primeiro_endereco;
+        byte verificador_erro, endereco;
+        const uint8_t endereco_inicial = 1, endereco_final = 127;
+        const int nenhum_dispositivo = 0;
         int numero_dispositivos;
-        //Serial.println("Verificando...");
+        
         numero_dispositivos = 0;
-        for (endereco_atual = primeiro_endereco; endereco_atual < ultimo_endereco; endereco_atual++)
-        {
-                while (endereco_atual != endereco)
+         for(endereco = endereco_inicial; endereco < endereco_final; endereco++ ) {
+                Wire.beginTransmission(endereco);
+                verificador_erro = Wire.endTransmission();
+                if (verificador_erro == SUCESSO)
                 {
-                        Wire.beginTransmission(endereco_atual);
-                        sinalizador = Wire.endTransmission();
-                        if (sinalizador == 0)
+                       /* Serial.print("I2C device found at address 0x");
+                        if (endereco<16) 
                         {
-                               
-                                numero_dispositivos++;
+                                Serial.print("0");
                         }
-                        else if (sinalizador == 4)
-                        {
-                              
-                        }
-                        endereco_atual++;
+                        Serial.println(endereco,HEX);*/
+                        numero_dispositivos++;
                 }
-        }
+                else if (verificador_erro==4) 
+                {
+                       Serial.print(" Erro desconhecido no endereço 0x");
+                        if (endereco<16) 
+                        {
+                                Serial.print("0");
+                        }
+                        Serial.println(endereco,HEX);
+                }    
+         }
+         if (numero_dispositivos == nenhum_dispositivo) 
+         {
+                return SINALIZADOR_ERRO;
+         }
+         else 
+         {
+                return SUCESSO;
+         }
+             
 }
