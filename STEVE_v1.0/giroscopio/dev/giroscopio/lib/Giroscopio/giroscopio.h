@@ -15,11 +15,10 @@
 
 #define ENDERECO_MPU_6050
 #ifdef ENDERECO_MPU_6050
-
 #define ENDERECO_0X68 0x68
 #define ENDERECO_0X69 0x69
-
 #endif
+
 
 
 #include <Adafruit_MPU6050.h>
@@ -36,6 +35,7 @@ int inicializa_sensor_mpu(int endereco_sensor_mpu, Adafruit_MPU6050 &Sensor);
 sensors_event_t leitura_sensor_mpu(Adafruit_MPU6050 &Sensor);
 int mostra_dados_giroscopio(sensors_event_t leitura_sensor_mpu);
 bool modo_operacional_sensor_mpu(Adafruit_MPU6050 &Sensor, bool status);
+int verifica_endereco_sensor();
 
 extern bool ativado;
 extern bool desativado;
