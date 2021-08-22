@@ -2,9 +2,6 @@
 #include "giroscopio.h"
 #include "steve_debug.h"
 
-
-
-
 extern const int endereco_mpu_modulo_1 = ENDERECO_0X68;
 extern const int endereco_mpu_modulo_2 = ENDERECO_0X69;
 
@@ -98,7 +95,7 @@ int verifica_endereco_sensor()
         int numero_dispositivos;
         
         numero_dispositivos = 0;
-         for(endereco = endereco_inicial; endereco < endereco_final; endereco++ ) {
+        for(endereco = endereco_inicial; endereco < endereco_final; endereco++ ) {
                 Wire.beginTransmission(endereco);
                 verificador_erro = Wire.endTransmission();
                 if (verificador_erro == SUCESSO)
@@ -120,14 +117,14 @@ int verifica_endereco_sensor()
                         }
                         Serial.println(endereco,HEX);
                 }    
-         }
-         if (numero_dispositivos == nenhum_dispositivo) 
-         {
-                return SINALIZADOR_ERRO;
-         }
-         else 
-         {
-                return SUCESSO;
-         }
+        }
+        if (numero_dispositivos == nenhum_dispositivo) 
+        {
+               return SINALIZADOR_ERRO;
+        }
+        else 
+        {
+               return SUCESSO;
+        }
              
 }
