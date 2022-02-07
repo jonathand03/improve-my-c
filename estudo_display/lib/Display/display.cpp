@@ -5,13 +5,14 @@
  * 
  */
 
-class IHM_LOGIC
-{
-    public:
-        IHM_LOGIC()
-};
+#include "display.h"
 
-class IHM_DISPLAY
+IHM::IHM()
 {
+    this->init();
+    this->setRotation(0);       
+    this->fillScreen(TFT_BLUE); 
+}
 
-};
+
+

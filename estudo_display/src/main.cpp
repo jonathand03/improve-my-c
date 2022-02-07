@@ -4,11 +4,14 @@
 #include <driver/pcnt.h>
 #include "botoes.h"
 #include <rom/gpio.h>
+#include "display.h"
 
 //TFT_eSPI Display = TFT_eSPI();
+
 Button ALERTA(23, RISING);
 void setup()
 {
+  IHM Teste();
   Serial.begin(115200);
  
 }
