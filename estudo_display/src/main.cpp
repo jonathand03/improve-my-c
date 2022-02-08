@@ -8,22 +8,19 @@
 
 //TFT_eSPI Display = TFT_eSPI();
 
-Button ALERTA(23, RISING);
+IHM Display;
 void setup()
 {
-  IHM Teste();
   Serial.begin(115200);
+  //Display.init();
+  //Display.fillScreen(TFT_BLUE);
+  //Display.drawCentreString("OLA MUNDO",50,50,4);
+  Display.TelaInicializacao();
  
 }
 
 void loop()
 {
-  ALERTA.ReadButton();
-  Serial.print(estado_botoes_ihm[0]);
-  Serial.print(estado_botoes_ihm[1]);
-  Serial.print(estado_botoes_ihm[2]);
-  Serial.print(estado_botoes_ihm[3]);
-  Serial.println(estado_botoes_ihm[4]);
+  
  
-  delay(2000);
 }

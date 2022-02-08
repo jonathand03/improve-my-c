@@ -7,12 +7,11 @@
 
 #include "display.h"
 
-IHM::IHM()
+void IHM::InicializaDisplay(void)
 {
     this->init();
-    this->setRotation(0);       
-    this->fillScreen(TFT_BLUE); 
-}
+    this->fillScreen(TFT_BLUE);
 
+}
 
 

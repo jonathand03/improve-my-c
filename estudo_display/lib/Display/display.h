@@ -6,8 +6,8 @@
 class IHM : public TFT_eSPI
 {
     public:
-        /* Construtor com inicalização*/
-        IHM();
+        /* Inicializacao*/
+        void InicializaDisplay(void);
         /*  Tela de Inicialização   */
         void TelaInicializacao(void);
         /*  Tela de Status inicial  */
@@ -43,8 +43,8 @@ class IHM : public TFT_eSPI
 
         
         
-
     private:
+
 };
 
 
