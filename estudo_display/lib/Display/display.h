@@ -25,7 +25,8 @@ class IHM : public TFT_eSPI
             void TelaMenuSC(void);
             /*Tela do menu dos microajustes*/
             void TelaMenuAjustes(void);
-
+            /* Tela de eleveção do steve */
+            void TelaElevacao(void);
         /***************************** Suporte Circulatorio *****************************/
             /* Tela de status do suporte ciculatorio */
             void TelaStatusSC(void);
@@ -45,26 +46,28 @@ class IHM : public TFT_eSPI
         /**************************** FIM DA INSTÂNCIA PUBLICA **************************/
     private:
         /***************************** Proporções da Tela *******************************/
+            /* Inicio de texto da tela inicial */
+            const uint16_t xInicial = 80;
             /* Proporções de tudo que vai aparacer na tela */
-            const uint16_t LarguraDisplay = 200;
-            const uint16_t AlturaDisplay = 190;
+            const uint16_t LarguraDisplay = 240;
+            const uint16_t AlturaDisplay = 240;
         /************** Proporções dos objetos no display em porcetagem  ****************/
             /* O eixo x da primeira opção do menu terá 40% da proporção do display  */
             const uint8_t xOpcoesMenu = 40;
             /* O eixo y da primeira opção no menu terá 10% da proporção do display  */
             const uint8_t yOpcoesMenu = 10;
             /* Espaçamento entre as opções será de 20% da proporção do display      */
-            const uint8_t yEntreOp = 20;
+            const uint8_t yEntreOp = 40;
             /* Proporção da altura do menu lateral será de 100% da altura total da tela */
             const uint8_t AlturaMenuIcones = 100;
             /* Proporção da largura da tela será de 32% da largura total do display */ 
-            const uint8_t LarguraMenuIcones = 32;
+            const uint8_t LarguraMenuIcones = 33;
             /* Enum para configuração das proporções */
-            enum Eixo{xEixo, yEixo};
+            enum Dimensao{largura, altura};
             /* Função para configuração de proporcionalidade */
-            int16_t RetornaProporcaoDisplay(Eixo EixoAtual)
+            int32_t ProporcaoMenuLateral(Dimensao Dimensao, uint16_t tam)
             {
-                return EixoAtual == xEixo ? LarguraDisplay*(EixoAtual/100) : AlturaDisplay*(EixoAtual/100) ;
+                return Dimensao == largura ? LarguraDisplay*(tam/100) : AlturaDisplay*(tam/100) ;
             }
         /******************************** PALETA DE CORES ********************************/
             /* Cor de fundo do menu quando é selecionado */
