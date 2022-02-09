@@ -3,26 +3,28 @@
 
 #include <TFT_eSPI.h>
 
+
 /*! @brief Essa é classe de mostragem de itens no display do dispositivo.
 *          Todas as funções aqui presentes, são exclusivamente de mostragem
 */
 class IHM : public TFT_eSPI
 {
     public:
-        /* Inicializacao*/
-        void InicializaDisplay(void);
-        /*  Tela de Inicialização   */
-        void TelaInicializacao(void);
-        /*  Tela de Status inicial  */
-        void StatusInicial(void);
-        /*  Tela do menu inicial    */
-        void TelaMenuInicial(void);
-        /*  Tela de Navegação       */
-        void NavegacaoMenu(void);
-        /*  Tela de menu do suporte circulatorio*/
-        void TelaMenuSC(void);
-        /*Tela do menu dos microajustes*/
-        void TelaMenuAjustes(void);
+        /********************************** Tela Inicial **********************************/
+            /* Inicializacao*/
+            void InicializaDisplay(void);
+            /*  Tela de Inicialização   */
+            void TelaInicializacao(void);
+            /*  Tela de Status inicial  */
+            void StatusInicial(void);
+            /*  Tela do menu inicial    */
+            void TelaMenuInicial(void);
+            /*  Tela de Navegação       */
+            void NavegacaoMenu(void);
+            /*  Tela de menu do suporte circulatorio*/
+            void TelaMenuSC(void);
+            /*Tela do menu dos microajustes*/
+            void TelaMenuAjustes(void);
 
         /***************************** Suporte Circulatorio *****************************/
             /* Tela de status do suporte ciculatorio */
@@ -46,9 +48,6 @@ class IHM : public TFT_eSPI
             /* Proporções de tudo que vai aparacer na tela */
             const uint16_t LarguraDisplay = 200;
             const uint16_t AlturaDisplay = 190;
-            /* Proporção do menu lateral */
-            const uint16_t AlturaMenuIcones = 190;
-            const uint16_t LarguraMenuIcones = 65;
         /************** Proporções dos objetos no display em porcetagem  ****************/
             /* O eixo x da primeira opção do menu terá 40% da proporção do display  */
             const uint8_t xOpcoesMenu = 40;
@@ -56,7 +55,17 @@ class IHM : public TFT_eSPI
             const uint8_t yOpcoesMenu = 10;
             /* Espaçamento entre as opções será de 20% da proporção do display      */
             const uint8_t yEntreOp = 20;
-
+            /* Proporção da altura do menu lateral será de 100% da altura total da tela */
+            const uint8_t AlturaMenuIcones = 100;
+            /* Proporção da largura da tela será de 32% da largura total do display */ 
+            const uint8_t LarguraMenuIcones = 32;
+            /* Enum para configuração das proporções */
+            enum Eixo{xEixo, yEixo};
+            /* Função para configuração de proporcionalidade */
+            int16_t RetornaProporcaoDisplay(Eixo EixoAtual)
+            {
+                return EixoAtual == xEixo ? LarguraDisplay*(EixoAtual/100) : AlturaDisplay*(EixoAtual/100) ;
+            }
         /******************************** PALETA DE CORES ********************************/
             /* Cor de fundo do menu quando é selecionado */
             const int AZUL = TFT_BLUE;

@@ -10,7 +10,12 @@
 void IHM::InicializaDisplay(void)
 {
     this->init();
-    this->fillScreen(TFT_BLUE);
+    this->TelaMenuInicial();
+
+}
+
+void IHM::TelaMenuInicial(void)
+{
 
 }
 
