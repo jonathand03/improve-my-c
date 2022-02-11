@@ -8,7 +8,9 @@
 #define MENU_SC_OP_2 "Ciclo"
 #define MENU_SC_OP_3 "Tempo"
 
-
+#define MENU_AJUSTE_OP_0 "Assento"
+#define MENU_AJUSTE_OP_1 "Encosto"
+#define MENU_AJUSTE_OP_2 "Suporte"
 
 
 /*! @brief Essa é classe de mostragem de itens no display do dispositivo.
@@ -25,7 +27,7 @@ class IHM : public TFT_eSPI
             /*  Tela de Status inicial  */
             void StatusInicial(void);
             /*  Tela do menu inicial    */
-            void TelaMenuInicial(int opcao);
+            void TelaMenuInicial(void);
             /*  Tela de Navegação       */
             void NavegacaoMenu(void);
             /*  Tela de menu do suporte circulatorio*/
@@ -33,7 +35,9 @@ class IHM : public TFT_eSPI
             /*Tela do menu dos microajustes*/
             void TelaMenuAjustes(void);
             /* Tela de eleveção do steve */
-            void TelaElevacao(void);
+            void TelaElevacao(int curso);
+            void PassaPorcimaSC(void);
+            void PassaPorcimaAjuste(void);
         /***************************** Suporte Circulatorio *****************************/
             /* Tela de status do suporte ciculatorio */
             void TelaStatusSC(void);
@@ -50,6 +54,9 @@ class IHM : public TFT_eSPI
             /* Ajustes Encosto */
             void AjusteInclinacaoEncosto(void);
             void AjusteVerticalEncosto(void);
+
+        /************************************* BARRAS ***********************************/
+        void ProgressoBarra(int value);
         /**************************** FIM DA INSTÂNCIA PUBLICA **************************/
     private:
         /***************************** Proporções da Tela *******************************/
