@@ -3,6 +3,13 @@
 
 #include <TFT_eSPI.h>
 
+#define MENU_SC_OP_0 "Status"
+#define MENU_SC_OP_1 "Angulo"
+#define MENU_SC_OP_2 "Ciclo"
+#define MENU_SC_OP_3 "Tempo"
+
+
+
 
 /*! @brief Essa é classe de mostragem de itens no display do dispositivo.
 *          Todas as funções aqui presentes, são exclusivamente de mostragem
@@ -18,7 +25,7 @@ class IHM : public TFT_eSPI
             /*  Tela de Status inicial  */
             void StatusInicial(void);
             /*  Tela do menu inicial    */
-            void TelaMenuInicial(void);
+            void TelaMenuInicial(int opcao);
             /*  Tela de Navegação       */
             void NavegacaoMenu(void);
             /*  Tela de menu do suporte circulatorio*/
@@ -53,21 +60,22 @@ class IHM : public TFT_eSPI
             const uint16_t AlturaDisplay = 240;
         /************** Proporções dos objetos no display em porcetagem  ****************/
             /* O eixo x da primeira opção do menu terá 40% da proporção do display  */
-            const uint8_t xOpcoesMenu = 40;
+            const int xOpcoesMenu = 40;
             /* O eixo y da primeira opção no menu terá 10% da proporção do display  */
-            const uint8_t yOpcoesMenu = 10;
+            const int yOpcoesMenu = 10;
             /* Espaçamento entre as opções será de 20% da proporção do display      */
-            const uint8_t yEntreOp = 40;
+            const int yEntreOp = 40;
             /* Proporção da altura do menu lateral será de 100% da altura total da tela */
-            const uint8_t AlturaMenuIcones = 100;
+            const int AlturaMenuIcones = 100;
             /* Proporção da largura da tela será de 32% da largura total do display */ 
-            const uint8_t LarguraMenuIcones = 33;
+            const int LarguraMenuIcones = 33;
             /* Enum para configuração das proporções */
             enum Dimensao{largura, altura};
+            enum Eixo{eixo_x, eixo_y};
             /* Função para configuração de proporcionalidade */
-            int32_t ProporcaoMenuLateral(Dimensao Dimensao, uint16_t tam)
+            int ProporcaoMenuLateral(Dimensao Dimensao, int tam)
             {
-                return Dimensao == largura ? LarguraDisplay*(tam/100) : AlturaDisplay*(tam/100) ;
+                return Dimensao == largura ? ((LarguraDisplay*tam)/100) : ((AlturaDisplay*tam)/100);
             }
         /******************************** PALETA DE CORES ********************************/
             /* Cor de fundo do menu quando é selecionado */
