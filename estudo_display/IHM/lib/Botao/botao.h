@@ -29,7 +29,6 @@ extern int QTD_BT;
 extern volatile int estado_botoes_ihm[qtd_bt_ihm] ;
 extern volatile int estado_bt_anterior[qtd_bt_ihm];
 
-
 /* Flags de logica do ihm */
 extern int opcao_atual;
 extern int opcao_anterior;

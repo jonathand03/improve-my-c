@@ -9,9 +9,9 @@ int opcao_atual = 0;
 int opcao_anterior = -1;
 int pagina_atual = 0;
 int limite_inf = 2;
-
 estado_botao verifica_botao_pressionado(e_botao botao_acionado)
 {
+    delay(150);
     estado_botao status_atual_verificao = desligado;
 
     if (estado_botoes_ihm[botao_acionado] == ligado)
@@ -130,10 +130,10 @@ Button::Button(int pin, int edge)
     if (QTD_BT == -1) // entra aqui primeira vez
     {
         pinMode(pin,INPUT);
-        attachInterrupt(pin, InterrruptFlagBtBaixo, edge);
+        attachInterrupt(pin, InterrruptFlagBtBaixo, FALLING);
        
     }
-    /*
+    
     if(QTD_BT == 0)
     {
         pinMode(pin,INPUT);
@@ -157,7 +157,7 @@ Button::Button(int pin, int edge)
         pinMode(pin,INPUT);
         attachInterrupt(pin, InterrruptFlagBtPanico, edge);
        // ButtonStatus.ButtonID = QTD_BT+1;
-    }*/
+    }
     QTD_BT++;
     ButtonStatus.ButtonID  = QTD_BT;
     ButtonStatus.ButtonEdge = edge;
@@ -176,7 +176,8 @@ uint8_t Button::ResumeButton(void)
        return 1;
    }
    
-}
+}extern long tempo_ant ;
+extern long tempo_atual;
 
 
 /* Pausa a interrupção do botão */
@@ -211,13 +212,10 @@ int Button::ReadButton(void)
         int verifica_bt = verifica_botao_pressionado(bt_baixo);
         if(verifica_bt == ligado)
         {
-            Serial.println(opcao_atual);
             if(opcao_atual == limite_inf)
                 opcao_atual = 0;
             else
                 opcao_atual++;
-            delay(100);
-           
         }
     }
     if(ButtonStatus.ButtonID == bt_cima)

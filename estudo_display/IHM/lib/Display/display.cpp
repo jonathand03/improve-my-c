@@ -97,10 +97,6 @@ void IHM::TelaMenuInicial(void)
 
 void IHM::NavegacaoMenu(void)
 {
-    int opcao_atual = 0;
-    int opcao_anterior = 0;
-    int pagina_atual = 0;
-
     if(opcao_atual != opcao_anterior)
     {
         if(pagina_atual == 0)
@@ -128,8 +124,40 @@ void IHM::TelaAngulo(void)
     int32_t altura_atual = 240;
 
     this->fillRect(80, 0, LarguraDisplay, AlturaDisplay, AZUL); // FUNÇÃO DA TELA DISPONIVEL
-    this->fillRect(0, 0, largura_atual, altura_atual, PRETO);   // FUNÇÃO DO MENU LATERAL
-    this->fillRect(80, 250, 200, 30, BRANCO);
+    this->setTextSize(2);
+    this->setTextColor(BRANCO);
+    this->drawString("ANGULO",100,20,4);
+    this->setTextSize(4);
+    this->drawNumber(10,140,80,4); // Alteravel
+    ProgressoBarra(100); // alteravel
+}
+
+void IHM::TelaCiclo(void)
+{
+    int32_t largura_atual = 80;
+    int32_t altura_atual = 240;
+
+    this->fillRect(80, 0, LarguraDisplay, AlturaDisplay, AZUL); // FUNÇÃO DA TELA DISPONIVEL
+    this->setTextSize(2);
+    this->setTextColor(BRANCO);
+    this->drawString("CICLO",130,20,4);
+    this->setTextSize(4);
+    this->drawNumber(10,140,80,4); // Alteravel
+    ProgressoBarra(100); // alteravel
+}
+
+void IHM::TelaTempo(void)
+{
+     int32_t largura_atual = 80;
+    int32_t altura_atual = 240;
+
+    this->fillRect(80, 0, LarguraDisplay, AlturaDisplay, AZUL); // FUNÇÃO DA TELA DISPONIVEL
+    this->setTextSize(2);
+    this->setTextColor(BRANCO);
+    this->drawString("TEMPO",115,20,4);
+    this->setTextSize(3);
+    this->drawString("00:30",105,85,4);// Alteravel
+    ProgressoBarra(100); // alteravel
 }
 
 void IHM::TelaElevacao(int curso)
@@ -150,8 +178,8 @@ void IHM::TelaElevacao(int curso)
 
 void IHM::ProgressoBarra(int value)
 {
-    this->fillRect(100, 180, 200, 40, BRANCO);
-    this->fillRect(100, 180, value, 40, TFT_GREEN);
+    this->fillRoundRect(100, 180, 200, 40, 8,BRANCO);
+    this->fillRoundRect(100, 180, value, 40,8, TFT_GREEN);
 
     /* Sinalizadores de inicio e fim de percurso
     if (value == 200)

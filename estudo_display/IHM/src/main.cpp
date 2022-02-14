@@ -12,23 +12,24 @@
 int barra = 20;
 int cont = 0;
 IHM Display;
-Button BtBaixo(35,HIGH);
+Button BtBaixo(34,FALLING);
 //Button BtCima(34,LOW);
 void setup()
 {
   Serial.begin(115200);
   Display.InicializaDisplay();
+  Display.TelaTempo();
  // pinMode(35,INPUT);
 }
 
 void loop()
 {
-  BtBaixo.ReadButton();
-  // if(opcao_atual != opcao_anterior)
-  // {
-  //   Display.TelaMenuInicial();
-  //   opcao_anterior = opcao_atual;
-  // }
-  //delay(100);
-  
+  /*BtBaixo.ReadButton();
+  if(opcao_atual != opcao_anterior)
+   {
+     Display.TelaMenuInicial();
+     opcao_anterior = opcao_atual;
+   }
+
+  */
 }
