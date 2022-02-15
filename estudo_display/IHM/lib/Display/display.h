@@ -3,6 +3,8 @@
 
 #include <TFT_eSPI.h>
 
+#define MENU_OP_SAIR "Sair"
+
 #define MENU_SC_OP_0 "Status"
 #define MENU_SC_OP_1 "Angulo"
 #define MENU_SC_OP_2 "Ciclo"
@@ -31,7 +33,7 @@ class IHM : public TFT_eSPI
             /*  Tela de Navegação       */
             void NavegacaoMenu(void);
             /*  Tela de menu do suporte circulatorio*/
-            void TelaMenuSC(void);
+            void TelaMenuSC(int op);
             /*Tela do menu dos microajustes*/
             void TelaMenuAjustes(void);
             /* Tela de eleveção do steve */

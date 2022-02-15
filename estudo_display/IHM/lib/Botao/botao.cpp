@@ -75,6 +75,7 @@ void evento_enter(void)
                 break;
             case 4: // se Sair
                 pagina_atual = 0;
+                opcao_anterior = -1;
                 break; 
        }
     }

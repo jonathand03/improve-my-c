@@ -7,50 +7,17 @@
 
 #include "display.h"
 #include "botao.h"
-/*
+#include "display_logica.h"
 
-  
-    this->fillRect(80,0,LarguraDisplay,AlturaDisplay,AZUL); // FUNÇÃO DA TELA DISPONIVEL
-    this->fillRect(0,0,ProporcaoMenuLateral(largura,LarguraMenuIcones),ProporcaoMenuLateral(altura,AlturaMenuIcones),PRETO); // FUNÇÃO DO MENU LATERAL
-    this->setTextSize(2);
-    this->setTextFont(4);
-    this->setTextColor(BRANCO);
-    
-    this->drawString(op_menu_sc[0],132,20);
-    this->drawString(op_menu_sc[1],132,96,4);
-    this->drawString(op_menu_sc[2],132,172,4);
+const char *op_menu_sc[5] =
+{
+    MENU_SC_OP_0,
+    MENU_SC_OP_1,
+    MENU_SC_OP_2,
+    MENU_SC_OP_3,
+    MENU_OP_SAIR
 
-    if(opcao == 0)
-    {
-        this->fillTriangle(80,10,120,40,80,70,BRANCO);
-        this->fillTriangle(80,162,120,192,80,222,AZUL); 
-    }
-    if(opcao == 1)
-    {
-        this->fillTriangle(80,10,120,40,80,70,AZUL);
-        this->fillTriangle(80,162,120,192,80,222,AZUL); 
-        this->fillTriangle(80,86,120,116,80,146,BRANCO);
-
-
-    }
-    if(opcao == 2)
-    {
-        this->fillTriangle(80,86,120,116,80,146,AZUL);
-        this->fillTriangle(80,162,120,192,80,222,BRANCO); 
-    }
-    // if(opcao == 3)
-    // {
-        // this->fillTriangle(80,162,120,192,80,222,AZUL); 
-        // this->fillTriangle(80,10,120,40,80,70,BRANCO); 
-    // }
-*/
-
-const char *op_menu_sc[4] =
-    {
-        MENU_SC_OP_0,
-        MENU_SC_OP_1,
-        MENU_SC_OP_2,
-        MENU_SC_OP_3};
+};
 
 void IHM::InicializaDisplay(void)
 {
@@ -101,20 +68,72 @@ void IHM::NavegacaoMenu(void)
     {
         if(pagina_atual == 0)
         {
-            this->StatusInicial();
+            this->TelaMenuInicial();
         }
+
         if(pagina_atual == 1)
         {
-            this->TelaMenuInicial();
+            this->TelaMenuSC(opcao_atual);
         }
         if(pagina_atual == 2)
         {
-            this->TelaMenuSC();
+            //this->TelaMenuAjustes();
         }
-        if(pagina_atual == 3)
+        if(pagina_atual == 11)
         {
-            this->TelaMenuAjustes();
+            this->TelaAngulo();
         }
+    }
+}
+
+void IHM::TelaMenuSC(int op)
+{
+
+    this->fillRect(80,0,LarguraDisplay,AlturaDisplay,AZUL); // FUNÇÃO DA TELA DISPONIVEL
+
+    this->setTextSize(2);
+    this->setTextFont(4);
+    this->setTextColor(BRANCO);
+
+    if(op < 3)
+    {
+        this->drawString(op_menu_sc[0],132,20);
+        this->drawString(op_menu_sc[1],132,96,4);
+        this->drawString(op_menu_sc[2],132,172,4);
+    }
+    else
+    {
+        this->fillRect(80,0,LarguraDisplay,AlturaDisplay,AZUL);
+        this->drawString(op_menu_sc[3],132,20);
+        this->drawString(op_menu_sc[4],132,96,4);
+    }
+
+
+    if(op == 0)
+    {
+        this->fillTriangle(80,10,120,40,80,70,BRANCO);
+        this->fillTriangle(80,162,120,192,80,222,AZUL); 
+    }
+    if(op == 1)
+    {
+        this->fillTriangle(80,10,120,40,80,70,AZUL);
+        this->fillTriangle(80,162,120,192,80,222,AZUL); 
+        this->fillTriangle(80,86,120,116,80,146,BRANCO);
+    }
+    if(op == 2)
+    {
+        this->fillTriangle(80,86,120,116,80,146,AZUL);
+        this->fillTriangle(80,162,120,192,80,222,BRANCO); 
+    }
+    if(op == 3)
+    {
+        this->fillTriangle(80,10,120,40,80,70,BRANCO);
+        this->fillTriangle(80,162,120,192,80,222,AZUL); 
+    }
+    if(op == 4)
+    {
+        this->fillTriangle(80,10,120,40,80,70,AZUL);
+        this->fillTriangle(80,86,120,116,80,146,BRANCO);
     }
 }
 
@@ -128,8 +147,8 @@ void IHM::TelaAngulo(void)
     this->setTextColor(BRANCO);
     this->drawString("ANGULO",100,20,4);
     this->setTextSize(4);
-    this->drawNumber(10,140,80,4); // Alteravel
-    ProgressoBarra(100); // alteravel
+    this->drawNumber(angulo_atual,170,80,4); // Alteravel
+    ProgressoBarra(angulo_atual*13); // alteravel
 }
 
 void IHM::TelaCiclo(void)
@@ -148,7 +167,7 @@ void IHM::TelaCiclo(void)
 
 void IHM::TelaTempo(void)
 {
-     int32_t largura_atual = 80;
+    int32_t largura_atual = 80;
     int32_t altura_atual = 240;
 
     this->fillRect(80, 0, LarguraDisplay, AlturaDisplay, AZUL); // FUNÇÃO DA TELA DISPONIVEL

@@ -3,33 +3,33 @@
 #include <rom/gpio.h>
 #include "display.h"
 #include "botao.h"
+#include "display_logica.h"
 /* Regra de Ouro 
   Ordem dos botões : baixo -> cima -> enter -> standup -> alerta
                       0        1        2         3         4
 
 */
-//TFT_eSPI Display = TFT_eSPI();
-int barra = 20;
-int cont = 0;
+
+
 IHM Display;
-Button BtBaixo(34,FALLING);
-//Button BtCima(34,LOW);
+
 void setup()
 {
   Serial.begin(115200);
   Display.InicializaDisplay();
-  Display.TelaTempo();
- // pinMode(35,INPUT);
+  pagina_atual = 11;
 }
 
 void loop()
 {
-  /*BtBaixo.ReadButton();
-  if(opcao_atual != opcao_anterior)
-   {
-     Display.TelaMenuInicial();
-     opcao_anterior = opcao_atual;
-   }
-
-  */
+  opcao_atual = 0;
+  opcao_anterior = -1;
+  Display.NavegacaoMenu();
+  NavegacaoLogica();
+  estado_botoes_ihm[bt_cima] = ligado;
+  delay(2000);
+  estado_botoes_ihm[bt_cima] = desligado;
+  delay(4000);
+ 
+  
 }
