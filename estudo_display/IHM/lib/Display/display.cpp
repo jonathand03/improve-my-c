@@ -9,6 +9,8 @@
 #include "botao.h"
 #include "display_logica.h"
 
+/*************** VETORES DE STRING DAS MENSANGES DOS MENUS*************/
+/* MENSAGENS DO MENU DO SUPORTE CIRCULATORIO */
 const char *op_menu_sc[5] =
 {
     MENU_SC_OP_0,
@@ -18,7 +20,7 @@ const char *op_menu_sc[5] =
     MENU_OP_SAIR
 
 };
-
+/* NUMERAÇÃO DO TEMPO ATUAL DE 00:30 SEGUNDOS A 03:00 MINUTOS */
 const char *tempo_config[6] =
 {
     OP_TEMPO_0,
@@ -28,6 +30,7 @@ const char *tempo_config[6] =
     OP_TEMPO_4,
     OP_TEMPO_5
 };
+
 void IHM::InicializaDisplay(void)
 {
     this->init();

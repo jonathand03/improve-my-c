@@ -1,14 +1,17 @@
 #include "botao.h"
 
-
-int QTD_BT = -1;
-volatile int estado_botoes_ihm[qtd_bt_ihm] = {desligado, desligado, desligado, desligado,desligado};
-volatile int estado_bt_anterior[qtd_bt_ihm] = {desligado, desligado, desligado, desligado,desligado};
+//!< Variaveis e flag dos botões 
+int QTD_BT = 0;
+volatile int estado_botoes_ihm[QTD_BT_IHM] = {desligado, desligado, desligado, desligado,desligado};
+volatile int estado_bt_anterior[QTD_BT_IHM] = {desligado, desligado, desligado, desligado,desligado};
 
 int opcao_atual = 0;
 int opcao_anterior = -1;
 int pagina_atual = 0;
 int limite_inf = 2;
+
+
+//!< Verifica o estado do botão pressionado, baseado no estado anterior 
 estado_botao verifica_botao_pressionado(e_botao botao_acionado)
 {
     delay(150);
@@ -18,16 +21,16 @@ estado_botao verifica_botao_pressionado(e_botao botao_acionado)
     {
         if (estado_bt_anterior[botao_acionado] == desligado)
 
-            status_atual_verificao = ligado; // retorna ligado
+            status_atual_verificao = ligado; 
         else
-            status_atual_verificao = continua_ligado; // retorna mantendo ligado
+            status_atual_verificao = continua_ligado; 
     }
     else
     {
         if (estado_bt_anterior[botao_acionado] == desligado)
-            status_atual_verificao = continua_desligado; // retorna mantendo desligado
+            status_atual_verificao = continua_desligado; 
         else
-            status_atual_verificao = desligado; // retorna desligando
+            status_atual_verificao = desligado; 
     }
     estado_bt_anterior[botao_acionado] = estado_botoes_ihm[botao_acionado];
     estado_botoes_ihm[botao_acionado] = desligado;
@@ -100,6 +103,7 @@ void evento_enter(void)
        
     }
 }
+
 void IRAM_ATTR InterrruptFlagBtBaixo()
 {
     estado_botoes_ihm[bt_baixo] = ligado;
@@ -125,77 +129,57 @@ void IRAM_ATTR InterrruptFlagBtPanico()
     estado_botoes_ihm[bt_panico] = ligado;
 }
 
-/* Inicializando botão utilizando interrupção de hardware */
+//!< Criando uma estrutura para suportar todas as funções de interrupção e anular os IFS no Construtor */
+typedef void (*FunctionVector)(void);    
+//!< Criando um vetor de funções baseados na estrutura criada anteriormente */
+FunctionVector StateFunction[QTD_BT_IHM] = {&InterrruptFlagBtBaixo, &InterrruptFlagBtCima,
+                                  &InterrruptFlagBtEnter,&InterrruptFlagBtStandup,
+                                  &InterrruptFlagBtPanico};
+
+//!< Inicializando botão utilizando interrupção de hardware 
 Button::Button(int pin, int edge)
 {
-    if (QTD_BT == -1) // entra aqui primeira vez
-    {
-        pinMode(pin,INPUT);
-        attachInterrupt(pin, InterrruptFlagBtBaixo, FALLING);
-       
-    }
-    
-    if(QTD_BT == 0)
-    {
-        pinMode(pin,INPUT);
-        attachInterrupt(pin, InterrruptFlagBtCima, edge);
-       // ButtonStatus.ButtonID = QTD_BT+1;
-    }
-    if(QTD_BT == 1)
-    {
-        pinMode(pin,INPUT);
-        attachInterrupt(pin, InterrruptFlagBtEnter, edge);
-        //ButtonStatus.ButtonID = QTD_BT+1;
-    }
-    if(QTD_BT == 2)
-    {
-        pinMode(pin,INPUT);
-        attachInterrupt(pin, InterrruptFlagBtStandup, edge);
-       // ButtonStatus.ButtonID = QTD_BT+1;
-    }
-    if(QTD_BT == 3)
-    {
-        pinMode(pin,INPUT);
-        attachInterrupt(pin, InterrruptFlagBtPanico, edge);
-       // ButtonStatus.ButtonID = QTD_BT+1;
-    }
+    pinMode(pin,INPUT);
+    attachInterrupt(pin,StateFunction[QTD_BT],edge);
+    this->ButtonStatus.ButtonID = QTD_BT;
+    this->ButtonStatus.ButtonEdge = edge;
+    this->ButtonStatus.ButtonPin = pin;
     QTD_BT++;
-    ButtonStatus.ButtonID  = QTD_BT;
-    ButtonStatus.ButtonEdge = edge;
-    ButtonStatus.ButtonPin = pin;
 }
 
+//!< Ativando Botão caso ele tenha sido parado anteriormente 
 uint8_t Button::ResumeButton(void)
 {
-   if(ButtonStatus.BtStopped == true)
-   {
-       // attachInterruptArg(ButtonStatus.ButtonPin, InterrruptFlag, (void *)ButtonStatus.ButtonID,  ButtonStatus.ButtonEdge);
+    //!< Verifica se o botão foi parado anteriormente. Caso sim, realoca a interrupção no pino 
+    if(this->ButtonStatus.BtStopped == true)
+    {
+        attachInterrupt(this->ButtonStatus.ButtonPin,
+                        StateFunction[this->ButtonStatus.ButtonID],
+                        this->ButtonStatus.ButtonEdge);
         return 0;
-   }
-   else
-   {
-       return 1;
-   }
+    }
+    else
+    {
+        return 1;
+    }
    
-}extern long tempo_ant ;
-extern long tempo_atual;
+}
 
-
-/* Pausa a interrupção do botão */
+//!<Pausa a interrupção do botão 
 uint8_t Button::StopButton(void)
 {
     if (QTD_BT <= 0)
     {
-        //Serial.print("Impossivel parar o botão pois não existe nenhum botão cadastrado");
         return 1;
     }
     else
     {
         esp_err_t STATUS;
-        STATUS = gpio_isr_handler_remove((gpio_num_t)ButtonStatus.ButtonPin);
+        STATUS = gpio_isr_handler_remove((gpio_num_t)this->ButtonStatus.ButtonPin);
         if (STATUS == ESP_OK)
         {
-            ButtonStatus.BtStopped = true;
+            this->ButtonStatus.BtStopped = true;
+            QTD_BT--;
             return 0;
         }
         else
@@ -208,7 +192,7 @@ uint8_t Button::StopButton(void)
 
 int Button::ReadButton(void)
 {
-    if(ButtonStatus.ButtonID == bt_baixo )
+    if(this->ButtonStatus.ButtonID == bt_baixo )
     {
         int verifica_bt = verifica_botao_pressionado(bt_baixo);
         if(verifica_bt == ligado)
@@ -219,7 +203,7 @@ int Button::ReadButton(void)
                 opcao_atual++;
         }
     }
-    if(ButtonStatus.ButtonID == bt_cima)
+    if(this->ButtonStatus.ButtonID == bt_cima)
     {
         int verifica_bt = verifica_botao_pressionado(bt_cima);
         if(verifica_bt == ligado)
@@ -231,7 +215,7 @@ int Button::ReadButton(void)
            
         }
     }
-    if(ButtonStatus.ButtonID == bt_enter)
+    if(this->ButtonStatus.ButtonID == bt_enter)
     {
         int verifica_bt = verifica_botao_pressionado(bt_enter);
         if(verifica_bt == ligado)

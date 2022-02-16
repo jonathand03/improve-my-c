@@ -24,10 +24,10 @@ enum e_botao
 };
 
 
-const int qtd_bt_ihm = 5;
+const int QTD_BT_IHM = 5;
 extern int QTD_BT;
-extern volatile int estado_botoes_ihm[qtd_bt_ihm] ;
-extern volatile int estado_bt_anterior[qtd_bt_ihm];
+extern volatile int estado_botoes_ihm[QTD_BT_IHM] ;
+extern volatile int estado_bt_anterior[QTD_BT_IHM];
 
 /* Flags de logica do ihm */
 extern int opcao_atual;
@@ -62,8 +62,11 @@ class Button
     public:
         /* Construtor de Inicialização da Classe Button */
         Button(int pin, int edge);
+        /* Função de incialização de um botão   */
+        void ButtonInit(int pin, int edge);
         /* Pausa ou encerra o botão */
         uint8_t StopButton(void);
+        /* Restarta o botão para operação padrão */
         uint8_t ResumeButton(void);
         /* Faz a Leitura do botão   */
         int ReadButton(void);
@@ -76,5 +79,8 @@ class Button
         int encapsula_intr(int pin, int bt_id);
         estado_botao verifica_botao_pressionado(e_botao botao_acionado);
         void evento_enter(void);
+
+
+
 
 #endif

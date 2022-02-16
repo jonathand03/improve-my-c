@@ -23,5 +23,4 @@ extern int ciclo_atual;
 extern int ciclo_max;
 extern int tempo_atual;
 extern int tempo_max;
-
 #endif

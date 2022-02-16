@@ -25,7 +25,8 @@ void NavegacaoLogica(void)
 
 
 
-
+/*! @brief PARTE LÓGICA DE CONFIGURAÇÃO DO ÂNGULO DA BASE DO SUPORTE CIRCULATÓRIO 
+*/
 void AnguloConfig(void)
 {
     int verifica_bt_cima ;
@@ -49,10 +50,16 @@ void AnguloConfig(void)
                 angulo_atual--;
         }
     }
+    // envia_dados_sc(COD_ALTERACAO_SC);
+    // envia_dados_sc(angulo_atual);
+    // envia_dados_sc(ciclo_atual);
+    // envia_dados_sc(tempo_envio[tempo_atual]);
 
   
 }
 
+/*! @brief PARTE LÓGICA DE CONFIGURAÇÃO DO CICLO DA BASE DO SUPORTE CIRCULATÓRIO 
+*/
 void CicloConfig(void)
 {
     int verifica_bt_cima ;
@@ -80,6 +87,4 @@ void CicloConfig(void)
     // envia_dados_sc(angulo_atual);
     // envia_dados_sc(ciclo_atual);
     // envia_dados_sc(tempo_envio[tempo_atual]);
-
-  
 }
