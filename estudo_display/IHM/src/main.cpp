@@ -1,6 +1,4 @@
 #include <Arduino.h>
-#include "TFT_eSPI.h"
-#include <rom/gpio.h>
 #include "display.h"
 #include "botao.h"
 #include "display_logica.h"
@@ -17,7 +15,8 @@ void setup()
 {
   Serial.begin(115200);
   Display.InicializaDisplay();
-  pagina_atual = 11;
+  pagina_atual = 13;
+  
 }
 
 void loop()
@@ -25,11 +24,13 @@ void loop()
   opcao_atual = 0;
   opcao_anterior = -1;
   Display.NavegacaoMenu();
-  NavegacaoLogica();
-  estado_botoes_ihm[bt_cima] = ligado;
-  delay(2000);
-  estado_botoes_ihm[bt_cima] = desligado;
-  delay(4000);
+  //NavegacaoLogica();
+  tempo_atual ++;
+  if(tempo_atual > tempo_max)
+  {
+    tempo_atual = 0;
+  }
+  delay(3000);
  
   
 }

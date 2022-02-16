@@ -1,12 +1,6 @@
 #ifndef DISPLAY_LOGICA_H
 #define DISPLAY_LOGICA_H
 
-extern int angulo_atual;
-extern int angulo_max;
-
-
-
-
 /* Logica SC */
 void StatusConfigSC(void);
 void AnguloConfig(void);
@@ -23,7 +17,11 @@ void SCAjusteVertical(void);
 /* Navegacao da logica dos ajustes */
 void NavegacaoLogica(void);
 
-
-
+extern int angulo_atual;
+extern int angulo_max;
+extern int ciclo_atual;
+extern int ciclo_max;
+extern int tempo_atual;
+extern int tempo_max;
 
 #endif

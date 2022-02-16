@@ -19,6 +19,15 @@ const char *op_menu_sc[5] =
 
 };
 
+const char *tempo_config[6] =
+{
+    OP_TEMPO_0,
+    OP_TEMPO_1,
+    OP_TEMPO_2,
+    OP_TEMPO_3,
+    OP_TEMPO_4,
+    OP_TEMPO_5
+};
 void IHM::InicializaDisplay(void)
 {
     this->init();
@@ -83,6 +92,14 @@ void IHM::NavegacaoMenu(void)
         {
             this->TelaAngulo();
         }
+        if(pagina_atual == 12)
+        {
+            this->TelaCiclo();
+        }
+        if(pagina_atual == 13)
+        {
+            this->TelaTempo();
+        }
     }
 }
 
@@ -137,46 +154,47 @@ void IHM::TelaMenuSC(int op)
     }
 }
 
+int value = 5;
 void IHM::TelaAngulo(void)
 {
-    int32_t largura_atual = 80;
-    int32_t altura_atual = 240;
-
     this->fillRect(80, 0, LarguraDisplay, AlturaDisplay, AZUL); // FUNÇÃO DA TELA DISPONIVEL
     this->setTextSize(2);
     this->setTextColor(BRANCO);
     this->drawString("ANGULO",100,20,4);
     this->setTextSize(4);
-    this->drawNumber(angulo_atual,170,80,4); // Alteravel
-    ProgressoBarra(angulo_atual*13); // alteravel
+   
+    if(angulo_atual < 10)
+        this->drawNumber(angulo_atual,170,80,4); 
+    else
+        this->drawNumber(angulo_atual,140,80,4); 
+   
+    ProgressoBarra((angulo_atual-value)*20); 
 }
 
 void IHM::TelaCiclo(void)
 {
-    int32_t largura_atual = 80;
-    int32_t altura_atual = 240;
-
     this->fillRect(80, 0, LarguraDisplay, AlturaDisplay, AZUL); // FUNÇÃO DA TELA DISPONIVEL
     this->setTextSize(2);
     this->setTextColor(BRANCO);
     this->drawString("CICLO",130,20,4);
     this->setTextSize(4);
-    this->drawNumber(10,140,80,4); // Alteravel
-    ProgressoBarra(100); // alteravel
+    if(ciclo_atual < 10)
+        this->drawNumber(ciclo_atual,170,80,4); 
+    else
+        this->drawNumber(ciclo_atual,140,80,4); 
+   
+    ProgressoBarra((ciclo_atual-value)*40); 
 }
 
 void IHM::TelaTempo(void)
 {
-    int32_t largura_atual = 80;
-    int32_t altura_atual = 240;
-
     this->fillRect(80, 0, LarguraDisplay, AlturaDisplay, AZUL); // FUNÇÃO DA TELA DISPONIVEL
     this->setTextSize(2);
     this->setTextColor(BRANCO);
     this->drawString("TEMPO",115,20,4);
     this->setTextSize(3);
-    this->drawString("00:30",105,85,4);// Alteravel
-    ProgressoBarra(100); // alteravel
+    this->drawString(tempo_config[tempo_atual],105,85,4); 
+    ProgressoBarra((tempo_atual*40)); 
 }
 
 void IHM::TelaElevacao(int curso)

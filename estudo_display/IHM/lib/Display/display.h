@@ -14,6 +14,12 @@
 #define MENU_AJUSTE_OP_1 "Encosto"
 #define MENU_AJUSTE_OP_2 "Suporte"
 
+#define OP_TEMPO_0 "00:30"
+#define OP_TEMPO_1 "01:00"
+#define OP_TEMPO_2 "01:30"
+#define OP_TEMPO_3 "02:00"
+#define OP_TEMPO_4 "02:30"
+#define OP_TEMPO_5 "03:00"
 
 /*! @brief Essa é classe de mostragem de itens no display do dispositivo.
 *          Todas as funções aqui presentes, são exclusivamente de mostragem
