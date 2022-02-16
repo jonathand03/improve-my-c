@@ -10,34 +10,30 @@ int opcao_anterior = -1;
 int pagina_atual = 0;
 int limite_inf = 2;
 
-
-//!< Verifica o estado do botão pressionado, baseado no estado anterior 
-estado_botao verifica_botao_pressionado(e_botao botao_acionado)
+void IRAM_ATTR InterrruptFlagBtBaixo()
 {
-    delay(150);
-    estado_botao status_atual_verificao = desligado;
-
-    if (estado_botoes_ihm[botao_acionado] == ligado)
-    {
-        if (estado_bt_anterior[botao_acionado] == desligado)
-
-            status_atual_verificao = ligado; 
-        else
-            status_atual_verificao = continua_ligado; 
-    }
-    else
-    {
-        if (estado_bt_anterior[botao_acionado] == desligado)
-            status_atual_verificao = continua_desligado; 
-        else
-            status_atual_verificao = desligado; 
-    }
-    estado_bt_anterior[botao_acionado] = estado_botoes_ihm[botao_acionado];
-    estado_botoes_ihm[botao_acionado] = desligado;
-    return status_atual_verificao;
+    estado_botoes_ihm[bt_baixo] = ligado;
 }
 
+void IRAM_ATTR InterrruptFlagBtCima()
+{
+    estado_botoes_ihm[bt_cima] = ligado;
+}
 
+void IRAM_ATTR InterrruptFlagBtEnter()
+{ 
+    estado_botoes_ihm[bt_enter] = ligado;
+}
+
+void IRAM_ATTR InterrruptFlagBtStandup()
+{
+    estado_botoes_ihm[bt_standup] = ligado;
+}
+
+void IRAM_ATTR InterrruptFlagBtPanico()
+{
+    estado_botoes_ihm[bt_panico] = ligado;
+}
 
 void evento_enter(void)
 {
@@ -104,30 +100,6 @@ void evento_enter(void)
     }
 }
 
-void IRAM_ATTR InterrruptFlagBtBaixo()
-{
-    estado_botoes_ihm[bt_baixo] = ligado;
-}
-
-void IRAM_ATTR InterrruptFlagBtCima()
-{
-    estado_botoes_ihm[bt_cima] = ligado;
-}
-
-void IRAM_ATTR InterrruptFlagBtEnter()
-{ 
-    estado_botoes_ihm[bt_enter] = ligado;
-}
-
-void IRAM_ATTR InterrruptFlagBtStandup()
-{
-    estado_botoes_ihm[bt_standup] = ligado;
-}
-
-void IRAM_ATTR InterrruptFlagBtPanico()
-{
-    estado_botoes_ihm[bt_panico] = ligado;
-}
 
 //!< Criando uma estrutura para suportar todas as funções de interrupção e anular os IFS no Construtor */
 typedef void (*FunctionVector)(void);    
@@ -156,6 +128,9 @@ uint8_t Button::ResumeButton(void)
         attachInterrupt(this->ButtonStatus.ButtonPin,
                         StateFunction[this->ButtonStatus.ButtonID],
                         this->ButtonStatus.ButtonEdge);
+        this->ButtonStatus.BtWorking = true;
+        this->ButtonStatus.BtStopped = false;
+        QTD_BT++;
         return 0;
     }
     else
@@ -163,6 +138,27 @@ uint8_t Button::ResumeButton(void)
         return 1;
     }
    
+}
+
+bool  Button::verifica_botao_pressionado(e_botao botao_acionado)
+{
+    delay(150);
+
+    if (estado_botoes_ihm[botao_acionado] == ligado)
+    {
+        estado_bt_anterior[botao_acionado] == desligado ? 
+                                              this->ButtonStatus.BtOn = true : 
+                                              this->ButtonStatus.BtStayOn = true;
+    }
+    else
+    {
+       estado_bt_anterior[botao_acionado] == desligado ?
+                                             this->ButtonStatus.BtStayOff = true :
+                                             this->ButtonStatus.BtOff = true; 
+    }
+    estado_bt_anterior[botao_acionado] = estado_botoes_ihm[botao_acionado];
+    estado_botoes_ihm[botao_acionado] = desligado;
+    return true;
 }
 
 //!<Pausa a interrupção do botão 
@@ -174,55 +170,24 @@ uint8_t Button::StopButton(void)
     }
     else
     {
-        esp_err_t STATUS;
-        STATUS = gpio_isr_handler_remove((gpio_num_t)this->ButtonStatus.ButtonPin);
-        if (STATUS == ESP_OK)
-        {
-            this->ButtonStatus.BtStopped = true;
-            QTD_BT--;
-            return 0;
-        }
-        else
-        {
-           // Serial.print("Erro ao pausar o botão");
-            return 1;
-        }
+        detachInterrupt(this->ButtonStatus.ButtonPin);
+        this->ButtonStatus.BtStopped = true;
+        this->ButtonStatus.BtWorking = false;
+        QTD_BT--;
+        return 0;
     }
 }
 
 int Button::ReadButton(void)
 {
-    if(this->ButtonStatus.ButtonID == bt_baixo )
-    {
-        int verifica_bt = verifica_botao_pressionado(bt_baixo);
-        if(verifica_bt == ligado)
+        bool verifica_bt = this->ButtonStatus.BtOn;
+        if(verifica_bt == true)
         {
-            if(opcao_atual == limite_inf)
-                opcao_atual = 0;
-            else
-                opcao_atual++;
+            opcao_atual == limite_inf ? opcao_atual = 0 : opcao_atual++;
+            this->ButtonStatus.BtOn = false;
         }
-    }
-    if(this->ButtonStatus.ButtonID == bt_cima)
-    {
-        int verifica_bt = verifica_botao_pressionado(bt_cima);
-        if(verifica_bt == ligado)
+        else
         {
-            if(opcao_atual == 0)
-                opcao_atual = limite_inf;
-            else
-                opcao_atual--;
-           
-        }
-    }
-    if(this->ButtonStatus.ButtonID == bt_enter)
-    {
-        int verifica_bt = verifica_botao_pressionado(bt_enter);
-        if(verifica_bt == ligado)
-        {
-            evento_enter();
-        }
-    }
-    return 0;
-    
+            return 1;
+        }   
 }

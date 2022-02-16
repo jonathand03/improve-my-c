@@ -73,6 +73,7 @@ class Button
         /* Status de configuração do botão  (para fins de debug)*/
         void StatusButton(void);
         BtInfo ButtonStatus;
+        bool verifica_botao_pressionado(e_botao botao_acionado);
 };
 
 
