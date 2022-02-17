@@ -27,35 +27,9 @@ void NavegacaoLogica(void)
 
 /*! @brief PARTE LÓGICA DE CONFIGURAÇÃO DO ÂNGULO DA BASE DO SUPORTE CIRCULATÓRIO 
 */
-void AnguloConfig(void)
-{
-    int verifica_bt_cima ;
-    int verifica_bt_baixo ;
-    while(verifica_botao_pressionado(bt_enter) != ligado)
-    {
-        verifica_bt_cima =  verifica_botao_pressionado(bt_cima);
-        verifica_bt_baixo = verifica_botao_pressionado(bt_baixo);
-        if (verifica_bt_cima == ligado) // se botao cima
-        {
-            if (angulo_atual == angulo_max)
-                angulo_atual = 5;
-            else
-                angulo_atual++;
-        }
-        else if (verifica_bt_baixo == ligado) // se botao baixo
-        {
-            if (angulo_atual == 5)
-                angulo_atual = angulo_max;
-            else
-                angulo_atual--;
-        }
-    }
-    // envia_dados_sc(COD_ALTERACAO_SC);
-    // envia_dados_sc(angulo_atual);
-    // envia_dados_sc(ciclo_atual);
-    // envia_dados_sc(tempo_envio[tempo_atual]);
-
-  
+void AnguloConfig(Button *Bt)
+{  
+   Bt->ReadButton(AlteraAngulo);
 }
 
 /*! @brief PARTE LÓGICA DE CONFIGURAÇÃO DO CICLO DA BASE DO SUPORTE CIRCULATÓRIO 
@@ -87,4 +61,14 @@ void CicloConfig(void)
     // envia_dados_sc(angulo_atual);
     // envia_dados_sc(ciclo_atual);
     // envia_dados_sc(tempo_envio[tempo_atual]);
+}
+
+void AjusteAssentoVertical(Button *Bt)
+{
+    Bt->StopButton();
+    while(digitalRead(Bt->ButtonStatus.ButtonPin) != LOW)
+    {
+        
+    }
+    // envia comando de ajuste vertical
 }

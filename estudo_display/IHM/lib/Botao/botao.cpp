@@ -1,4 +1,5 @@
 #include "botao.h"
+#include "display_logica.h"
 
 //!< Variaveis e flag dos botões 
 int QTD_BT = 0;
@@ -9,6 +10,8 @@ int opcao_atual = 0;
 int opcao_anterior = -1;
 int pagina_atual = 0;
 int limite_inf = 2;
+
+
 
 void IRAM_ATTR InterrruptFlagBtBaixo()
 {
@@ -100,6 +103,13 @@ void evento_enter(void)
     }
 }
 
+void EventoBaixo(void)
+{
+   
+       if(pagina_atual == 0 || pagina_atual == 1 || pagina_atual == 2 || pagina_atual == 3)
+            opcao_atual == limite_inf ? opcao_atual = 0 : opcao_atual++;
+          
+}
 
 //!< Criando uma estrutura para suportar todas as funções de interrupção e anular os IFS no Construtor */
 typedef void (*FunctionVector)(void);    
@@ -130,7 +140,6 @@ uint8_t Button::ResumeButton(void)
                         this->ButtonStatus.ButtonEdge);
         this->ButtonStatus.BtWorking = true;
         this->ButtonStatus.BtStopped = false;
-        QTD_BT++;
         return 0;
     }
     else
@@ -143,7 +152,6 @@ uint8_t Button::ResumeButton(void)
 bool  Button::verifica_botao_pressionado(e_botao botao_acionado)
 {
     delay(150);
-
     if (estado_botoes_ihm[botao_acionado] == ligado)
     {
         estado_bt_anterior[botao_acionado] == desligado ? 
@@ -173,21 +181,75 @@ uint8_t Button::StopButton(void)
         detachInterrupt(this->ButtonStatus.ButtonPin);
         this->ButtonStatus.BtStopped = true;
         this->ButtonStatus.BtWorking = false;
-        QTD_BT--;
         return 0;
     }
 }
 
-int Button::ReadButton(void)
+
+/*
+
+
+ AlteraAngulo,
+    AlteraCiclo,
+    AlteraTempo,
+    AjusteAssentoH,
+    AjusteAssentoV,
+    AjusteEncostoI,
+    AjusteEncostoV,
+    Standup,
+    Alerta,
+    Enter,
+    Cima,
+    Baixo,
+*/
+int Button::ReadButton(operacao operacao_atual)
 {
-        bool verifica_bt = this->ButtonStatus.BtOn;
-        if(verifica_bt == true)
+    if(this->ButtonStatus.BtOn == true)
+    {
+        if(this->ButtonStatus.ButtonID == bt_baixo)
         {
-            opcao_atual == limite_inf ? opcao_atual = 0 : opcao_atual++;
-            this->ButtonStatus.BtOn = false;
+            switch (operacao_atual)
+            {
+                case AlteraAngulo:
+                    angulo_atual == 5 ? angulo_atual = angulo_max : angulo_atual--;
+                    break;
+                case AlteraCiclo:
+                    ciclo_atual == 5 ? ciclo_atual = ciclo_max : ciclo_atual--;
+                    break;
+                case AlteraTempo:
+                    tempo_atual == 0 ? tempo_atual = tempo_max : tempo_atual--;
+                    break;
+                case AjusteAssentoH:
+                    // envia codigo do ajuste assento horizontal RECUO
+                    break;
+                case AjusteAssentoV:
+                    break;
+            }
         }
-        else
+        if(this->ButtonStatus.ButtonID == bt_cima)
         {
-            return 1;
-        }   
+            switch (operacao_atual)
+            {
+                case AlteraAngulo:
+                    angulo_atual == angulo_max ? angulo_atual = 5 : angulo_atual++;
+                    break;
+                case AlteraCiclo:
+                    ciclo_atual == ciclo_max ? ciclo_atual = 5 : ciclo_atual++;
+                    break;
+                case AlteraTempo:
+                    tempo_atual == tempo_max ? tempo_atual = 0 : tempo_atual++;
+                    break;
+                case AjusteAssentoH:
+                    // envia codigo do ajuste assento horizontal RECUO
+                    break;
+                case AjusteAssentoV:
+                    break;
+            }
+        }
+    }
+    this->ButtonStatus.BtOn = false;
+    this->ButtonStatus.BtStayOff = false;
+    this->ButtonStatus.BtStayOn = false;
+    this->ButtonStatus.BtOff = false;
+    return 0;
 }

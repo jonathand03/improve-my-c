@@ -4,7 +4,21 @@
 #include <stdint.h>
 #include <Arduino.h>
 
-
+enum operacao
+{
+    AlteraAngulo,
+    AlteraCiclo,
+    AlteraTempo,
+    AjusteAssentoH,
+    AjusteAssentoV,
+    AjusteEncostoI,
+    AjusteEncostoV,
+    Standup,
+    Alerta,
+    Enter,
+    Cima,
+    Baixo,
+};
 
 enum estado_botao
 {
@@ -52,7 +66,7 @@ class Button
             bool BtWorking ;
             bool BtStopped ;
             /* Configurações do botão */
-            int ButtonPin;
+            uint8_t ButtonPin;
             int8_t ButtonID ;
             int ButtonEdge;
 
@@ -69,7 +83,7 @@ class Button
         /* Restarta o botão para operação padrão */
         uint8_t ResumeButton(void);
         /* Faz a Leitura do botão   */
-        int ReadButton(void);
+        int ReadButton(operacao operacao_atual);
         /* Status de configuração do botão  (para fins de debug)*/
         void StatusButton(void);
         BtInfo ButtonStatus;
