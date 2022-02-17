@@ -103,14 +103,6 @@ void evento_enter(void)
     }
 }
 
-void EventoBaixo(void)
-{
-   
-       if(pagina_atual == 0 || pagina_atual == 1 || pagina_atual == 2 || pagina_atual == 3)
-            opcao_atual == limite_inf ? opcao_atual = 0 : opcao_atual++;
-          
-}
-
 //!< Criando uma estrutura para suportar todas as funções de interrupção e anular os IFS no Construtor */
 typedef void (*FunctionVector)(void);    
 //!< Criando um vetor de funções baseados na estrutura criada anteriormente */
@@ -149,9 +141,8 @@ uint8_t Button::ResumeButton(void)
    
 }
 
-bool  Button::verifica_botao_pressionado(e_botao botao_acionado)
+void  Button::isPressed(int botao_acionado)
 {
-    delay(150);
     if (estado_botoes_ihm[botao_acionado] == ligado)
     {
         estado_bt_anterior[botao_acionado] == desligado ? 
@@ -166,7 +157,6 @@ bool  Button::verifica_botao_pressionado(e_botao botao_acionado)
     }
     estado_bt_anterior[botao_acionado] = estado_botoes_ihm[botao_acionado];
     estado_botoes_ihm[botao_acionado] = desligado;
-    return true;
 }
 
 //!<Pausa a interrupção do botão 
@@ -185,66 +175,44 @@ uint8_t Button::StopButton(void)
     }
 }
 
-
-/*
-
-
- AlteraAngulo,
-    AlteraCiclo,
-    AlteraTempo,
-    AjusteAssentoH,
-    AjusteAssentoV,
-    AjusteEncostoI,
-    AjusteEncostoV,
-    Standup,
-    Alerta,
-    Enter,
-    Cima,
-    Baixo,
-*/
-int Button::ReadButton(operacao operacao_atual)
+int Button::ReadButton(void)
 {
+    this->isPressed(this->ButtonStatus.ButtonID);
     if(this->ButtonStatus.BtOn == true)
     {
         if(this->ButtonStatus.ButtonID == bt_baixo)
         {
-            switch (operacao_atual)
+            switch (pagina_atual)
             {
-                case AlteraAngulo:
-                    angulo_atual == 5 ? angulo_atual = angulo_max : angulo_atual--;
+                case 0: // se  for a pagina inicial
+                    NavegacaoPagina(2,bt_baixo);
                     break;
-                case AlteraCiclo:
-                    ciclo_atual == 5 ? ciclo_atual = ciclo_max : ciclo_atual--;
+                case 1: // se for a pagina do suporte circulatorio
+                    NavegacaoPagina(4,bt_baixo);
                     break;
-                case AlteraTempo:
-                    tempo_atual == 0 ? tempo_atual = tempo_max : tempo_atual--;
+                case 2: // se for a pagina de ajustes
+                    NavegacaoPagina(2,bt_baixo);
                     break;
-                case AjusteAssentoH:
-                    // envia codigo do ajuste assento horizontal RECUO
+                case 10: // se for a pagina de status do SC
+                    NavegacaoPagina(1,bt_baixo);
                     break;
-                case AjusteAssentoV:
+                case 11: // se for a pagina do angulo
+                    AlteraAnguloBaixo();
+                    break;
+                case 12: // se for a pagina do ciclo
+                    AlteraCicloBaixo();
+                    break;
+                case 13: // se for a pagina do tempo
+                    AlteraTempoBaixo();
+                    break;
+                case 21: // se for a pagina de ajuste do assento
+                    AjusteAssentoHorizontal(bt_baixo,this);
                     break;
             }
         }
         if(this->ButtonStatus.ButtonID == bt_cima)
         {
-            switch (operacao_atual)
-            {
-                case AlteraAngulo:
-                    angulo_atual == angulo_max ? angulo_atual = 5 : angulo_atual++;
-                    break;
-                case AlteraCiclo:
-                    ciclo_atual == ciclo_max ? ciclo_atual = 5 : ciclo_atual++;
-                    break;
-                case AlteraTempo:
-                    tempo_atual == tempo_max ? tempo_atual = 0 : tempo_atual++;
-                    break;
-                case AjusteAssentoH:
-                    // envia codigo do ajuste assento horizontal RECUO
-                    break;
-                case AjusteAssentoV:
-                    break;
-            }
+            
         }
     }
     this->ButtonStatus.BtOn = false;

@@ -10,65 +10,55 @@ int ciclo_max = 10;
 int tempo_atual = 0;
 int tempo_max = 5;
 
-/* Funções de leitura de teclado e interação com o usuário */
-void NavegacaoLogica(void)
+void NavegacaoPagina(int LimiteNavegacao, int Bt)
 {
-    if(pagina_atual == 11) // se SC
+    if(Bt == bt_baixo)
     {
-        AnguloConfig();
+        opcao_atual == LimiteNavegacao ? opcao_atual = 0 : opcao_atual++;
     }
-    if(pagina_atual == 12)
+    else
     {
-
+        opcao_atual == 0 ? opcao_atual = LimiteNavegacao : opcao_atual++;
     }
 }
 
-
-
-/*! @brief PARTE LÓGICA DE CONFIGURAÇÃO DO ÂNGULO DA BASE DO SUPORTE CIRCULATÓRIO 
-*/
-void AnguloConfig(Button *Bt)
-{  
-   Bt->ReadButton(AlteraAngulo);
+void AlteraAnguloBaixo(void)
+{
+    angulo_atual == 5 ? angulo_atual = angulo_max : angulo_atual--;
+}
+void AlteraAnguloCima(void)
+{
+    angulo_atual == angulo_max ? angulo_atual = 5 : angulo_atual++;
 }
 
-/*! @brief PARTE LÓGICA DE CONFIGURAÇÃO DO CICLO DA BASE DO SUPORTE CIRCULATÓRIO 
-*/
-void CicloConfig(void)
+void AlteraCicloBaixo(void)
 {
-    int verifica_bt_cima ;
-    int verifica_bt_baixo ;
-    while(verifica_botao_pressionado(bt_enter) != ligado)
-    {
-        verifica_bt_cima =  verifica_botao_pressionado(bt_cima);
-        verifica_bt_baixo = verifica_botao_pressionado(bt_baixo);
-        if (verifica_bt_cima == ligado) // se botao cima
-        {
-            if (ciclo_atual == ciclo_max)
-                ciclo_atual = 5;
-            else
-                ciclo_atual++;
-        }
-        else if (verifica_bt_baixo == ligado) // se botao baixo
-        {
-            if (ciclo_atual == 5)
-                ciclo_atual = ciclo_max;
-            else
-                ciclo_atual--;
-        }
-    }
-    // envia_dados_sc(COD_ALTERACAO_SC);
-    // envia_dados_sc(angulo_atual);
-    // envia_dados_sc(ciclo_atual);
-    // envia_dados_sc(tempo_envio[tempo_atual]);
+     ciclo_atual == 5 ? ciclo_atual = ciclo_max : ciclo_atual--;
+}
+void AlteraCicloCima(void)
+{
+     ciclo_atual == ciclo_max ? ciclo_atual = 5 : ciclo_atual++;
 }
 
-void AjusteAssentoVertical(Button *Bt)
+
+void AlteraTempoBaixo(void)
 {
-    Bt->StopButton();
-    while(digitalRead(Bt->ButtonStatus.ButtonPin) != LOW)
+    tempo_atual == 0 ? tempo_atual = tempo_max : tempo_atual--;
+}
+void AlteraTempoCima(void)
+{
+    tempo_atual == tempo_max ? tempo_atual = 0 : tempo_atual++;
+}
+
+
+void AjusteAssentoHorizontal(int bt, Button *button)
+{
+    button->StopButton();
+    bt == bt_baixo ? 1/* Envia dados de recuo ativado */ : 2/*Envia dados de avanço ativado */ ;
+    while(digitalRead(button->ButtonStatus.ButtonPin) != LOW)
     {
-        
+
     }
-    // envia comando de ajuste vertical
+    bt == bt_baixo ? 1/* Envia dados de recuo parar */ : 2/*Envia dados de avanço parar */ ;
+    button->ResumeButton();
 }

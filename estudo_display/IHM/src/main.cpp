@@ -10,6 +10,9 @@
 
 
 IHM Display;
+Button btBaixo(35,RISING);
+Button btCima(34, RISING);
+
 
 void setup()
 {

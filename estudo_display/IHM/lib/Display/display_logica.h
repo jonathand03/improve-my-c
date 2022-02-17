@@ -17,6 +17,18 @@ void SCAjusteVertical(void);
 /* Navegacao da logica dos ajustes */
 void NavegacaoLogica(void);
 
+
+
+void AlteraAnguloBaixo(void);
+void AlteraAnguloCima(void);
+void AlteraCicloBaixo(void);
+void AlteraCicloCima(void);
+void AlteraTempoBaixo(void);
+void AlteraTempoCima(void);
+
+void NavegacaoPagina(int LimiteNavegacao, int Bt);
+void AjusteAssentoHorizontal(int bt, Button *button);
+
 extern int angulo_atual;
 extern int angulo_max;
 extern int ciclo_atual;

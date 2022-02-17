@@ -69,8 +69,6 @@ class Button
             uint8_t ButtonPin;
             int8_t ButtonID ;
             int ButtonEdge;
-
-
         }BtInfo;
 
     public:
@@ -83,17 +81,17 @@ class Button
         /* Restarta o botão para operação padrão */
         uint8_t ResumeButton(void);
         /* Faz a Leitura do botão   */
-        int ReadButton(operacao operacao_atual);
+        int ReadButton(void);
         /* Status de configuração do botão  (para fins de debug)*/
         void StatusButton(void);
         BtInfo ButtonStatus;
-        bool verifica_botao_pressionado(e_botao botao_acionado);
+        void isPressed(int botao_acionado);
 };
 
 
-        int encapsula_intr(int pin, int bt_id);
-        estado_botao verifica_botao_pressionado(e_botao botao_acionado);
-        void evento_enter(void);
+int encapsula_intr(int pin, int bt_id);
+estado_botao verifica_botao_pressionado(e_botao botao_acionado);
+void evento_enter(void);
 
 
 
