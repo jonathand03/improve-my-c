@@ -2,37 +2,31 @@
 #include "display.h"
 #include "botao.h"
 #include "display_logica.h"
+
 /* Regra de Ouro 
   Ordem dos botões : baixo -> cima -> enter -> standup -> alerta
                       0        1        2         3         4
-
+  39 cima
+  34 enter
+  35 standup
 */
 
 
 IHM Display;
-Button btBaixo(35,RISING);
-Button btCima(34, RISING);
-
+Button btBaixo(39,RISING);
+Button btCima(34,RISING);
+Button btEnter(35, RISING);
 
 void setup()
 {
   Serial.begin(115200);
   Display.InicializaDisplay();
-  pagina_atual = 13;
-  
 }
 
 void loop()
 {
-  opcao_atual = 0;
-  opcao_anterior = -1;
   Display.NavegacaoMenu();
-  //NavegacaoLogica();
-  tempo_atual ++;
-  if(tempo_atual > tempo_max)
-  {
-    tempo_atual = 0;
-  }
-  delay(3000);
- 
+  btBaixo.ReadButton();
+  btCima.ReadButton();
+  btEnter.ReadButton();
 }

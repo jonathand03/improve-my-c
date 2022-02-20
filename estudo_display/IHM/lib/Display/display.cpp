@@ -31,11 +31,24 @@ const char *tempo_config[6] =
     OP_TEMPO_5
 };
 
+const char *op_menu_ajuste[3] =
+{
+    MENU_AJUSTE_OP_0,
+    MENU_AJUSTE_OP_1,
+    MENU_AJUSTE_OP_2
+};
+
+bool mostra_op_1 = false;
+bool mostra_op_2 = false;
 void IHM::InicializaDisplay(void)
 {
     this->init();
     this->setRotation(1);
     this->fillScreen(BRANCO);
+
+    this->setTextSize(2);
+    this->setTextFont(4);
+    this->setTextColor(BRANCO);
 
     int32_t largura_atual = 80;
     int32_t altura_atual = 240;
@@ -50,29 +63,6 @@ void IHM::InicializaDisplay(void)
     this->TelaMenuInicial();
 }
 
-void IHM::TelaMenuInicial(void)
-{
-
-    if (opcao_atual == 0)
-    {
-        this->fillRect(0,161,80,80,PRETO);
-        this->fillRect(0,0,80,80,BRANCO);
-    }
-    if (opcao_atual == 1)
-    {
-        this->fillRect(0,0,80,79,PRETO);
-        this->fillRect(0,81,80,79,BRANCO);
-    }
-    if (opcao_atual == 2)
-    {
-        this->fillRect(0,81,80,79,PRETO);
-        this->fillRect(0,162,80,80,BRANCO);
-    }
-    else
-    {
-        //eror
-    }
-}
 
 void IHM::NavegacaoMenu(void)
 {
@@ -83,37 +73,92 @@ void IHM::NavegacaoMenu(void)
             this->TelaMenuInicial();
         }
 
-        if(pagina_atual == 1)
+        else if(pagina_atual == 1)
         {
             this->TelaMenuSC(opcao_atual);
         }
-        if(pagina_atual == 2)
+        else if(pagina_atual == 2)
         {
             //this->TelaMenuAjustes();
         }
-        if(pagina_atual == 11)
+        else if(pagina_atual == 11)
         {
             this->TelaAngulo();
         }
-        if(pagina_atual == 12)
+        else if(pagina_atual == 12)
         {
             this->TelaCiclo();
         }
-        if(pagina_atual == 13)
+        else if(pagina_atual == 13)
         {
             this->TelaTempo();
         }
+        else
+        {
+
+        }
+        opcao_anterior = opcao_atual;
     }
 }
+
+void IHM::TelaMenuInicial(void)
+{
+
+    if (opcao_atual == 0)
+    {
+        this->fillRect(0,161,80,80,PRETO);
+        this->fillRect(0,81,80,79,PRETO);
+        this->fillRect(0,0,80,80,BRANCO);
+        if(mostra_op_1 == false)
+        {
+            this->fillRect(80,0,LarguraDisplay,AlturaDisplay,AZUL);
+            this->drawString(op_menu_sc[0],132,20);
+            this->drawString(op_menu_sc[1],132,96,4);
+            this->drawString(op_menu_sc[2],132,172,4);
+        }
+        mostra_op_1 = true;
+        mostra_op_2 = false;
+
+    }
+    else if (opcao_atual == 1)
+    {
+        this->fillRect(0,0,80,80,PRETO);
+        this->fillRect(0,81,80,79,BRANCO);
+        this->fillRect(0,161,80,80,PRETO);
+
+        if(mostra_op_2 == false)
+        {
+            this->fillRect(80,0,LarguraDisplay,AlturaDisplay,AZUL);
+            this->drawString(op_menu_ajuste[0],120,20);
+            this->drawString(op_menu_ajuste[1],120,96,4);
+            this->drawString(op_menu_ajuste[2],120,172,4);
+        }
+        mostra_op_2 = true;
+        mostra_op_1 = false;
+       
+    }
+    else if (opcao_atual == 2)
+    {
+        this->fillRect(0,0,80,80,PRETO);
+        this->fillRect(0,81,80,79,PRETO);
+        this->fillRect(0,161,80,80,BRANCO);
+    }
+    else
+    {
+        //eror
+    }
+}
+
 
 void IHM::TelaMenuSC(int op)
 {
 
     this->fillRect(80,0,LarguraDisplay,AlturaDisplay,AZUL); // FUNÇÃO DA TELA DISPONIVEL
-
+    this->fillRect(0,0,80,80,AZUL);
     this->setTextSize(2);
     this->setTextFont(4);
     this->setTextColor(BRANCO);
+   
 
     if(op < 3)
     {
@@ -134,26 +179,30 @@ void IHM::TelaMenuSC(int op)
         this->fillTriangle(80,10,120,40,80,70,BRANCO);
         this->fillTriangle(80,162,120,192,80,222,AZUL); 
     }
-    if(op == 1)
+    else if(op == 1)
     {
         this->fillTriangle(80,10,120,40,80,70,AZUL);
         this->fillTriangle(80,162,120,192,80,222,AZUL); 
         this->fillTriangle(80,86,120,116,80,146,BRANCO);
     }
-    if(op == 2)
+    else if(op == 2)
     {
         this->fillTriangle(80,86,120,116,80,146,AZUL);
         this->fillTriangle(80,162,120,192,80,222,BRANCO); 
     }
-    if(op == 3)
+    else if(op == 3)
     {
         this->fillTriangle(80,10,120,40,80,70,BRANCO);
         this->fillTriangle(80,162,120,192,80,222,AZUL); 
     }
-    if(op == 4)
+    else if(op == 4)
     {
         this->fillTriangle(80,10,120,40,80,70,AZUL);
         this->fillTriangle(80,86,120,116,80,146,BRANCO);
+    }
+    else
+    {
+
     }
 }
 
@@ -165,13 +214,17 @@ void IHM::TelaAngulo(void)
     this->setTextColor(BRANCO);
     this->drawString("ANGULO",100,20,4);
     this->setTextSize(4);
-   
+    
     if(angulo_atual < 10)
+    {
         this->drawNumber(angulo_atual,170,80,4); 
+    }
     else
+    {
         this->drawNumber(angulo_atual,140,80,4); 
-   
-    ProgressoBarra((angulo_atual-value)*20); 
+    }
+    int progresso = (angulo_atual-value)*20;
+    ProgressoBarra(progresso); 
 }
 
 void IHM::TelaCiclo(void)

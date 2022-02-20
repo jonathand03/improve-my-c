@@ -6,9 +6,9 @@ int QTD_BT = 0;
 volatile int estado_botoes_ihm[QTD_BT_IHM] = {desligado, desligado, desligado, desligado,desligado};
 volatile int estado_bt_anterior[QTD_BT_IHM] = {desligado, desligado, desligado, desligado,desligado};
 
-int opcao_atual = 0;
-int opcao_anterior = -1;
-int pagina_atual = 0;
+volatile int opcao_atual = 0;
+volatile int opcao_anterior = -1;
+volatile int pagina_atual = 0;
 int limite_inf = 2;
 
 
@@ -45,8 +45,10 @@ void evento_enter(void)
         switch (opcao_atual)
         {
             case 0: // caso esteja na opcao SC
-                limite_inf = 4;
                 pagina_atual = 1; // pagina do SC
+                limite_inf = 4;
+                opcao_atual = 0;
+                opcao_anterior = -1;
                 break;
             case 1: // caso esteja na opcao ajustes
                 limite_inf= 3;
@@ -58,28 +60,37 @@ void evento_enter(void)
         }
       
     }
-    if(pagina_atual == 1) // se a pagina for do Suporte circulatorio
+    else if(pagina_atual == 1) // se a pagina for do Suporte circulatorio
     {
-       switch (opcao_atual)
-       {
-            case 0: // se Status SC
+        switch (opcao_atual)
+        {
+            case 0:
                 pagina_atual = 10;
-                limite_inf = 1;
+                opcao_atual = 0;
+                opcao_anterior = -1;
+                limite_inf = 1; // da o limite inferior de 1 para opção de sim ou nao
                 break;
-            case 1: // se Angulo
+            case 1:
                 pagina_atual = 11;
+                opcao_atual = 0;
+                opcao_anterior = -1;
                 break;
-            case 2: // se ciclo
+            case 2:
                 pagina_atual = 12;
+                opcao_atual = 0;
+                opcao_anterior = -1;
                 break;
-            case 3: // se Tempo
+            case 3:
                 pagina_atual = 13;
+                opcao_atual = 0;
+                opcao_anterior = -1;
                 break;
-            case 4: // se Sair
+            case 4:
                 pagina_atual = 0;
                 opcao_anterior = -1;
-                break; 
-       }
+                opcao_atual = 0;
+                break;
+        }
     }
     else if(pagina_atual == 2) // Se pagina de ajustes
     {
@@ -100,6 +111,44 @@ void evento_enter(void)
                 break;
         }
        
+    }
+    else if(pagina_atual == 10) // status
+    {
+       switch (opcao_atual)
+       {
+            case 0:
+                pagina_atual = 1;
+                opcao_atual = 0;
+                opcao_anterior = -1;
+                break;
+            case 1:
+                pagina_atual = 1;
+                opcao_atual = 0;
+                opcao_anterior = -1;
+                break;
+       }
+    }
+    else if(pagina_atual == 11) // angulo
+    {
+        pagina_atual = 1;
+        opcao_atual = 1;
+        opcao_anterior = -1;
+    }
+    else if(pagina_atual == 12) // ciclo
+    {
+        pagina_atual = 1;
+        opcao_atual = 2;
+        opcao_anterior = -1;
+    }
+    else if(pagina_atual == 13) // tempo
+    {
+        pagina_atual = 1;
+        opcao_atual = 3;
+        opcao_anterior = -1;
+    }
+    else
+    {
+        //nothing
     }
 }
 
@@ -182,6 +231,7 @@ int Button::ReadButton(void)
     {
         if(this->ButtonStatus.ButtonID == bt_baixo)
         {
+            
             switch (pagina_atual)
             {
                 case 0: // se  for a pagina inicial
@@ -210,9 +260,42 @@ int Button::ReadButton(void)
                     break;
             }
         }
-        if(this->ButtonStatus.ButtonID == bt_cima)
+        else if(this->ButtonStatus.ButtonID == bt_cima)
+        {
+            switch (pagina_atual)
+            {
+                case 0: // se  for a pagina inicial
+                    NavegacaoPagina(2,bt_cima);
+                    break;
+                case 1: // se for a pagina do suporte circulatorio
+                    NavegacaoPagina(4,bt_cima);
+                    break;
+                case 2: // se for a pagina de ajustes
+                    NavegacaoPagina(2,bt_cima);
+                    break;
+                case 10:
+                    NavegacaoPagina(1,bt_cima);
+                    break;
+                case 11:
+                    AlteraAnguloCima();
+                    break;
+                case 12:
+                    AlteraCicloCima();
+                    break;
+                case 13:
+                    AlteraTempoCima();
+                    break;
+                case 21:
+                    AjusteAssentoHorizontal(bt_cima,this);
+                    break;
+            }
+        }
+        else if(this->ButtonStatus.ButtonID ==  bt_enter)
         {
             
+            delay(200);
+            evento_enter();
+            Serial.println(pagina_atual);
         }
     }
     this->ButtonStatus.BtOn = false;
