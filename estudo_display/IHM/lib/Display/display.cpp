@@ -81,6 +81,10 @@ void IHM::NavegacaoMenu(void)
         {
             //this->TelaMenuAjustes();
         }
+        else if(pagina_atual == 10)
+        {
+            this->TelaStatusSC();
+        }
         else if(pagina_atual == 11)
         {
             this->TelaAngulo();
@@ -93,9 +97,9 @@ void IHM::NavegacaoMenu(void)
         {
             this->TelaTempo();
         }
-        else
+        else if(pagina_atual == 30)
         {
-
+            this->TelaElevacao(200);
         }
         opcao_anterior = opcao_atual;
     }
@@ -206,6 +210,53 @@ void IHM::TelaMenuSC(int op)
     }
 }
 
+void IHM::TelaStatusSC(void)
+{
+    this->fillRect(0, 0, 240, 240, AZUL); // FUNÇÃO DA TELA DISPONIVEL
+    this->setTextSize(2);
+    this->setTextColor(BRANCO);
+
+        this->fillRect(80,160,90,60,AZUL);
+        this->fillRect(140,160,60,50,AZUL);
+        this->setTextSize(1);
+        this->setTextColor(BRANCO);
+        this->drawString("SIM",81,160,4);
+        this->drawString("NAO",81,160,4);
+    if(statusSC == true)
+    {
+        this->drawString("Ativado",70,20,4);
+        this->setTextSize(1);
+        this->drawString("Desativar Suporte ?",70,80,4);
+    }
+    else
+    {
+        this->setTextSize(2);
+        this->drawString("Desativado",35,20,4);
+        this->setTextSize(1);
+        this->drawString("Ativar Suporte ?",80,100,4);
+    }
+
+    if(opcao_atual == 0)
+    {   
+        this->fillRect(80,160,90,60,BRANCO);
+        this->setTextSize(1);
+        this->setTextColor(PRETO);
+        this->drawString("SIM",81,160,4);
+    }
+    else if(opcao_atual == 1)
+    {
+        this->fillRect(140,160,60,50,BRANCO);
+        this->setTextSize(1);
+        this->setTextColor(PRETO);
+        this->drawString("NAO",141,160,4);
+    }
+    else
+    {
+        //erro
+    }
+   
+}
+
 int value = 5;
 void IHM::TelaAngulo(void)
 {
@@ -255,11 +306,18 @@ void IHM::TelaTempo(void)
 
 void IHM::TelaElevacao(int curso)
 {
-    
+    this->fillRect(80, 0, LarguraDisplay, AlturaDisplay, AZUL); // FUNÇÃO DA TELA DISPONIVEL
     this->setTextSize(2);
     this->setTextFont(4);
     this->setTextColor(BRANCO);
-    this->drawString("Elevacao", 100, 20);
+    if(elevacao == true)
+    {
+        this->drawString("Elevacao", 100, 20);
+    }
+    else
+    {
+        this->drawString("Recuo", 130, 20);
+    }
 
     if (curso == 200)
     {

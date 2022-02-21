@@ -11,7 +11,8 @@ volatile int opcao_anterior = -1;
 volatile int pagina_atual = 0;
 int limite_inf = 2;
 
-
+bool elevacao = false;
+bool statusSC = false;
 
 void IRAM_ATTR InterrruptFlagBtBaixo()
 {
@@ -117,6 +118,7 @@ void evento_enter(void)
        switch (opcao_atual)
        {
             case 0:
+                statusSC = !statusSC;
                 pagina_atual = 1;
                 opcao_atual = 0;
                 opcao_anterior = -1;
@@ -292,10 +294,14 @@ int Button::ReadButton(void)
         }
         else if(this->ButtonStatus.ButtonID ==  bt_enter)
         {
-            
-            delay(200);
             evento_enter();
-            Serial.println(pagina_atual);
+        }
+        else if(this->ButtonStatus.ButtonID == bt_standup)
+        {
+            pagina_atual = 30;
+            opcao_atual = 0;
+            opcao_anterior = -1;
+            elevacao = !elevacao;
         }
     }
     this->ButtonStatus.BtOn = false;

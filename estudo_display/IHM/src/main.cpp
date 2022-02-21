@@ -13,9 +13,10 @@
 
 
 IHM Display;
-Button btBaixo(39,RISING);
-Button btCima(34,RISING);
-Button btEnter(35, RISING);
+Button btBaixo(25,RISING); // Key 1
+Button btCima(39,RISING); // Key 2
+Button btEnter(34, RISING); // Key 3
+Button btStandup(35, RISING);
 
 void setup()
 {
@@ -29,4 +30,5 @@ void loop()
   btBaixo.ReadButton();
   btCima.ReadButton();
   btEnter.ReadButton();
+  btStandup.ReadButton();
 }

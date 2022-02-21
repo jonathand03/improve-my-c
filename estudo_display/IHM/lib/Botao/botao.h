@@ -48,7 +48,8 @@ extern volatile int opcao_atual;
 extern volatile int opcao_anterior;
 extern volatile int pagina_atual;
 extern int limite_inf;
-
+extern bool elevacao;
+extern bool statusSC;
 
 
 

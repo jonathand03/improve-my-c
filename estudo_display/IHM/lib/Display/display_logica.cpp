@@ -48,7 +48,6 @@ void AlteraCicloCima(void)
     opcao_anterior = -1;
 }
 
-
 void AlteraTempoBaixo(void)
 {
     tempo_atual == 0 ? tempo_atual = tempo_max : tempo_atual--;
@@ -121,4 +120,9 @@ void AjusteBaseSC(int bt, Button *button)
     }
     // bt == bt_baixo ? 1/* Envia dados de recuo parar */ : 2/*Envia dados de avanço parar */ ;
     button->ResumeButton();
+}
+
+void TelaStandup(void)
+{
+
 }
