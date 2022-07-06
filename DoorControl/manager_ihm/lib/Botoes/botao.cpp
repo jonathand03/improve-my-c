@@ -50,7 +50,7 @@ gpio_num_t gpio_handle[ButtonSpace::button_type_max] =
 double reading = 0;
 
 
-double voltage_verify(int button)
+double get_voltage(button_type_t button)
 {
     int captura_voltage = 0;
     double result;
@@ -201,7 +201,7 @@ uint8_t ButtonSpace::Button::init(uint8_t border_activate, button_type_t type)
     this->button_info.is_paused = false;
     this->button_info.last_state = gpio_get_level(gpio(this->button_info.button_type));
     this->button_info.border_type = border_activate;
-    STEVE_LOG("Função inicializada com sucesso");
+    LOG("Função inicializada com sucesso");
     return INIT_SUCESS;
 }
 
@@ -294,7 +294,6 @@ uint8_t ButtonSpace::Button::process(void (*onPressCallBack)(void),void (*onRele
         uint8_t GET_START_RETURN;
         uint8_t GET_PAUSE_RETURN = this->pause(); // pausei o hardware
         if(GET_PAUSE_RETURN == PAUSE_ERROR){return 1;}
-        delay(20);
         this->button_info.current_state = gpio_get_level(gpio(this->button_info.button_type));
         if(this->button_info.current_state != this->button_info.last_state)
         {
@@ -314,7 +313,7 @@ uint8_t ButtonSpace::Button::process(void (*onPressCallBack)(void),void (*onRele
             }
             else
             {
-
+                // nothing to do or state error
             }
             this->button_info.last_state = this->button_info.current_state;
             GET_START_RETURN = this->start();
