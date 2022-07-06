@@ -54,7 +54,7 @@ namespace ButtonSpace
 }
 
 extern gpio_num_t gpio_handle[ButtonSpace::button_type_max];
-double verifica_tensao(int button);
+double get_voltage(button_type_t button);
 void teste_press(void);
 void test_out(void);
 
