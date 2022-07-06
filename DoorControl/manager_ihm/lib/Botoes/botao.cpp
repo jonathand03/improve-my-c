@@ -5,49 +5,50 @@
 #include "esp_adc_cal.h"
 #include "steve_debug.h"
 
-
-
-#define ESP_INTR_FLAG_DEFAULT 0
-#define DEBUG
 bool first_defined_button = false;
 // Flags de ativação de cada botão
-
-
 volatile bool flag_down_button = false;
 volatile bool flag_up_button = false;
 volatile bool flag_enter_button = false;
 volatile bool flag_standup_button = false;
+volatile bool flag_panic_button = false;
 
 volatile bool previous_flag_down_button = false;
 volatile bool previous_flag_up_button = false;
 volatile bool previous_flag_enter_button = false;
 volatile bool previous_flag_standup_button = false;
+volatile bool previous_flag_panic_button = false;
 
-volatile bool button_flags[4] =
+volatile bool button_flags[5] =
 {
     flag_down_button,
     flag_up_button,
     flag_enter_button,
     flag_standup_button,
+    flag_panic_button
 };
 
-volatile bool previous_button_flags[4] =
+volatile bool previous_button_flags[5] =
 {
     previous_flag_down_button,
     previous_flag_up_button,
     previous_flag_enter_button,
     previous_flag_standup_button,
+    previous_flag_panic_button
 };
-
-double reading = 0;
 
 gpio_num_t gpio_handle[ButtonSpace::button_type_max] =
 {
     GPIO_NUM_25, // baixo
     GPIO_NUM_39, // cima
     GPIO_NUM_34, // enter
-    GPIO_NUM_36 // standup
+    GPIO_NUM_36, // standup
+    GPIO_NUM_39 // panico
 };
+
+
+double reading = 0;
+
 
 double voltage_verify(int button)
 {
@@ -70,20 +71,16 @@ double voltage_verify(int button)
         case 39:
             reading = adc1_get_raw(ADC1_CHANNEL_3);
             result = 3.3*(reading)/4096;
-            Serial.print(result);
             break;
     }
 
     return result;
 }
 
-
-
-
 void BT_ACTVATE(void *args)
 {
     int button_position = (int) args;
-    button_flags[button_position] = true;
+    button_flags[button_position] = true;   
 }
 
 void DOWN_BT_ACTIVATE(void)
@@ -102,8 +99,17 @@ void STANDUP_BT_ACTIVATE(void)
 {
     flag_standup_button = true;
 }
+void PANIC_BT_ACTIVATE(void)
+{
+    flag_panic_button = true;
+}
 
-/**
+ButtonSpace::Button::Button(uint8_t border_activate, button_type_t type)
+{
+    this->button_info.border_type = border_activate;
+    this->button_info.button_type = type;
+}
+/** TODO: Fazer tradução
  * @brief Essa função tem como objetivo verificar qual modo de interrupção definida,
  * no padrão arduino e converter para o padrão da espressif
  * @param[in] type_to_convert é o tipo de interrupção no padrão arduino
@@ -117,38 +123,38 @@ gpio_int_type_t ButtonSpace::conversion_int_type(uint8_t type_to_convert)
         case ONLOW:
             my_type = GPIO_INTR_LOW_LEVEL;
             #ifdef DEBUG
-                Serial.println("Definido o pino em [ON LOW]");
+                LOG("Definido o pino em [ON LOW]");
             #endif
             break;
         case ONHIGH:
             my_type = GPIO_INTR_HIGH_LEVEL;
             #ifdef DEBUG
-                Serial.println("Definido o pino em [ON HIGH]");
+                LOG("Definido o pino em [ON HIGH]");
             #endif
             break;
         case CHANGE:
             my_type = GPIO_INTR_ANYEDGE;
             #ifdef DEBUG
-                Serial.println("Definido o pino em [CHANGE]");
+                LOG("Definido o pino em [CHANGE]");
             #endif
             break;
         case FALLING:
             my_type = GPIO_INTR_NEGEDGE;
             #ifdef DEBUG
-                Serial.println("Definido o pino em [FALLING]");
+                LOG("Definido o pino em [FALLING]");
             #endif
             break;
         case RISING:
             my_type = GPIO_INTR_POSEDGE;
              #ifdef DEBUG
-                Serial.println("Definido o pino em [RISING]");
+                LOG("Definido o pino em [RISING]");
             #endif
             break;
         default:
             my_type = GPIO_INTR_DISABLE;
             #ifdef DEBUG
-                Serial.println("Borda de interrupção não definida ou não encontrada...");
-                Serial.println("Setando o padrão: [SEM INTERRUPÇÃO] ");
+                LOG("Borda de interrupção não definida ou não encontrada...");
+                LOG("Setando o padrão: [SEM INTERRUPÇÃO] ");
             #endif
             break;
     }
@@ -165,7 +171,7 @@ gpio_num_t ButtonSpace::gpio(button_type_t button)
  * @brief initialize the button with your activation border and type function in Steve
  * @param[in] border_activate Wich border the interrupt was activate
  * @param[in] type Functionally in the Steve
- * @return Return Sucess, if the initialization was sucefull, Return a error flag if was not ok.
+ * @return Return INIT_SUCESS, if the initialization was sucefull, Return a error flag if was not ok.
  */
 uint8_t ButtonSpace::Button::init(uint8_t border_activate, button_type_t type)
 {
@@ -193,60 +199,74 @@ uint8_t ButtonSpace::Button::init(uint8_t border_activate, button_type_t type)
     first_defined_button = true;
     this->button_info.button_type = type;
     this->button_info.is_paused = false;
-    return SUCESS;
+    this->button_info.last_state = gpio_get_level(gpio(this->button_info.button_type));
+    this->button_info.border_type = border_activate;
+    STEVE_LOG("Função inicializada com sucesso");
+    return INIT_SUCESS;
 }
 
 uint8_t ButtonSpace::Button::read(void)
 {
-    delay(50);
+    delay(50); // debounce
     uint8_t button =  this->button_info.button_type;
-    if(button_flags[button] == true)
+    if(button == down)
     {
-        if(previous_button_flags[button] == false) // botão foi ligado
-        {
-            previous_button_flags[button] = button_flags[button];
-            button_flags[button] = false;
-            return on;
-        }
-        else // botão permanece ligado
-        {
-            previous_button_flags[button] = button_flags[button];
-            button_flags[button] = false;
-            return stay_on; 
-        }
+        this->process(teste_press,test_out);
+        return 0;
     }
     else
     {
-        if(previous_button_flags[button] == false) // botão continua desligado
+        if(button_flags[button] == true)
         {
-            previous_button_flags[button] = button_flags[button];
-            button_flags[button] = false;
-            return stay_off;
+            if(previous_button_flags[button] == false) // botão foi ligado
+            {
+                previous_button_flags[button] = button_flags[button];
+                button_flags[button] = false;
+                return on;
+            }
+            else // botão permanece ligado
+            {
+                previous_button_flags[button] = button_flags[button];
+                button_flags[button] = false;
+                return stay_on; 
+            }
         }
-        else // botão foi desligado
+        else
         {
-            previous_button_flags[button] = button_flags[button];
-            button_flags[button] = false;
-            return off; 
+            if(previous_button_flags[button] == false) // botão continua desligado
+            {
+                previous_button_flags[button] = button_flags[button];
+                button_flags[button] = false;
+                return stay_off;
+            }
+            else // botão foi desligado
+            {
+                previous_button_flags[button] = button_flags[button];
+                button_flags[button] = false;
+                return off; 
+            }
         }
     }
+   
 }
 
-
+/** TODO: Fazer a descrição dessa função no padrão doxygen
+ * @brief Pause the button process
+ * @return */
 uint8_t ButtonSpace::Button::pause(void)
 {
     if(this->button_info.is_paused == true)
     {
         #ifdef DEBUG
-            Serial.println("Botão já está em pausa");
+            LOG("Botão já está em pausa");
         #endif
-        return 1;
+        return PAUSE_ERROR;
     }
     else
     {
         this->button_info.is_paused = true;
         esp_err_t GET_RETURN_INTR_DIS = gpio_intr_disable(gpio(this->button_info.button_type));
-        return GET_RETURN_INTR_DIS == ESP_OK ? 0 : 1;
+        return GET_RETURN_INTR_DIS == ESP_OK ? PAUSE_SUCESS : PAUSE_ERROR;
     }
 }
 
@@ -255,15 +275,53 @@ uint8_t ButtonSpace::Button::start(void)
     if(this->button_info.is_paused == false)
     {
         #ifdef DEBUG
-            Serial.println("Botão já está em execução normal");
+            LOG("Botão já está em execução normal");
         #endif
-        return 1;
+        return START_ERROR;
     }
     else
     {
         this->button_info.is_paused = false;
         esp_err_t GET_RETURN_INTR_EN = gpio_intr_enable(gpio(this->button_info.button_type));
-        return GET_RETURN_INTR_EN == ESP_OK ? 0 : 1;
+        return GET_RETURN_INTR_EN == ESP_OK ? START_SUCESS : START_ERROR;
     }
 }
+
+uint8_t ButtonSpace::Button::process(void (*onPressCallBack)(void),void (*onReleaseCallBack)(void))
+{
+    if(this->button_info.is_paused == false)
+    {
+        uint8_t GET_START_RETURN;
+        uint8_t GET_PAUSE_RETURN = this->pause(); // pausei o hardware
+        if(GET_PAUSE_RETURN == PAUSE_ERROR){return 1;}
+        delay(20);
+        this->button_info.current_state = gpio_get_level(gpio(this->button_info.button_type));
+        if(this->button_info.current_state != this->button_info.last_state)
+        {
+            if(this->button_info.current_state == 1)
+            {
+                if(onPressCallBack != NULL)
+                {
+                    onPressCallBack(); 
+                }
+            }
+            else if(this->button_info.last_state == 1)
+            {
+                if(onReleaseCallBack != NULL)
+                {
+                    onReleaseCallBack();
+                }
+            }
+            else
+            {
+
+            }
+            this->button_info.last_state = this->button_info.current_state;
+            GET_START_RETURN = this->start();
+            if(GET_START_RETURN == START_ERROR){return 1;}
+            return pressed_out;
+        }
+    }
+}
+
 #endif
