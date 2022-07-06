@@ -1,62 +1,44 @@
-/*! @file botao.h
-*   @brief Lib com as funções dos botões do ESP-IHM
-*   ****
-*/
-
 #ifndef BOTAO_H
 #define BOTAO_H
+
 #include <stdint.h>
+#include <Arduino.h>
+#include "file.h"
+#include "driver/gpio.h"
+#include "display_logica.h"
+#include "com.h"
+#define BUTTON_ON
 
-/* 
-*   BOTOES NO IHM
-*/
-#define COD_BT_CIMA (36)  // KEY 1
-#define COD_BT_BAIXO (39) // KEY 2
-#define COD_BT_ENTER (34) // KEY 3
-#define COD_BT_STADUP (35) // KEY 4
-#define COD_BT_PANICO (32) // KEY 5
-
-
-/*
-*   Micro Ajustes
-*/
-#define COD_AJUSTE_AVANCO (35) // KEY 9
-#define COD_AJUSTE_RECUO (36) // KEY 10
-
-enum estado_botao
+//------------ TODO: Convert to English ----//
+namespace ButtonSpace
 {
-    desligado,
-    ligado,
-    continua_desligado,
-    continua_ligado
-};
+    enum button_type_t{down,up,enter,standup,button_type_max};
+    enum button_state{on,off,stay_on,stay_off};
 
+    // Flags de tratamento de retorno
+    enum return_button_flags{INSTALL_ERROR = 5,INTR_TYPE_ERROR,INTR_ENABLE_ERROR,GPIO_DIRECTION_ERROR,ISR_ADD_ERROR};
+    typedef struct
+    {
+        unsigned long int last_time_read;
+        button_type_t button_type;
+        bool is_paused;
+    }button_info_t;
+    
+    //converte valores de Arduino Framework pra Espressif Framework
+    gpio_int_type_t conversion_int_type(uint8_t type_to_convert);
+    gpio_num_t gpio(button_type_t button);
 
-enum e_botao
-{
-    e_botao_baixo, 
-    e_botao_cima,
-    e_botao_enter,
-    e_botao_standup,
-    e_botao_panico,
-    e_qtd_botoes
-};
+    class Button
+    {
+        public:
+            uint8_t init(uint8_t border_activate, button_type_t type);
+            uint8_t read(void);
+            uint8_t start(void);
+            uint8_t pause(void);
+            button_info_t button_info;
+    };
+}
 
-extern int estado_botoes_ihm[e_qtd_botoes];
-extern int estado_bt_anterior[5];
-
-
-void inicializa_botoes_ihm(void);
-void inicializa_estado_botoes_ihm(void);
-int retorna_pino_botao(e_botao botao);
-
-void registra_interrupcao(void);
-void interrupcao_bt_baixo();
-void interrupcao_bt_cima();
-void interrupcao_bt_enter();
-void interrupcao_bt_standup();
-
-void ativa_interrupcao_pino(e_botao botao_intr);
-void desativa_interrupcao_pino(e_botao botao_intr);
-
-#endif
+extern gpio_num_t gpio_handle[ButtonSpace::button_type_max];
+double verifica_tensao(int button);
+#endif 
